@@ -6,129 +6,93 @@
     <title>Flashcards SIG - Modo Oscuro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Clase para ocultar vistas */
-        .view-hidden {
-            display: none;
-        }
-
-        /* --- Estilos del Sidebar (Sin cambios respecto a la versión anterior) --- */
-        #sidebar {
-            transition: transform 0.3s ease-in-out;
-            transform: translateX(-100%);
-        }
+        /* ... (Estilos idénticos a la versión anterior) ... */
+        .view-hidden { display: none; }
+        #sidebar { transition: transform 0.3s ease-in-out; transform: translateX(-100%); }
         @media (min-width: 768px) {
-            #sidebar {
-                transform: translateX(0);
-            }
-            #main-content {
-                margin-left: 16rem; /* w-64 */
-            }
-            #open-sidebar-btn, #close-sidebar-btn, #sidebar-overlay {
-                display: none;
-            }
+            #sidebar { transform: translateX(0); }
+            #main-content { margin-left: 16rem; /* w-64 */ }
+            #open-sidebar-btn, #close-sidebar-btn, #sidebar-overlay { display: none; }
         }
-        #sidebar-overlay {
-            transition: opacity 0.3s ease-in-out;
-            opacity: 0;
-            pointer-events: none;
-        }
-        #sidebar-overlay.visible {
-             opacity: 0.75;
-             pointer-events: auto;
-        }
-        /* --- Fin Estilos Sidebar --- */
-
-        /* --- Estilos Simplificados para la Tarjeta Única --- */
-        .flashcard-container {
-            position: relative; /* Mantenido por si se necesita posicionar algo dentro */
-            cursor: pointer; /* Hacer toda el área clickeable */
-        }
-        /* Estilo base para el contenido de la tarjeta */
-        #flashcard-content {
-             transition: background-color 0.3s ease, border-color 0.3s ease; /* Transición suave de color */
-             width: 100%;
-             height: 100%;
-             display: flex;
-             align-items: center;
-             justify-content: center;
-             overflow: auto; /* Para respuestas largas */
-        }
-        /* Clases para alternar estilos */
-        .card-question-style {
-            background-color: #DBEAFE; /* bg-blue-100 */
-            border-color: #93C5FD; /* border-blue-300 */
-        }
-        .card-answer-style {
-            background-color: #D1FAE5; /* bg-green-100 */
-            border-color: #6EE7B7; /* border-green-300 */
-        }
-        /* --- Fin Estilos Tarjeta Única --- */
-
-
-        /* Estilos adicionales para modo oscuro */
-        body { color: #e5e7eb; /* gray-200 */ }
-        #card-text { color: #1f2937; /* gray-800 */ } /* Texto oscuro en ambas caras */
-        #pile-to-learn-count, #pile-almost-count, #pile-learned-count { color: #1f2937; /* gray-800 */ }
-        #all-cards-table-body td { color: #d1d5db; /* gray-300 */ }
+        #sidebar-overlay { transition: opacity 0.3s ease-in-out; opacity: 0; pointer-events: none; }
+        #sidebar-overlay.visible { opacity: 0.75; pointer-events: auto; }
+        .flashcard-container { position: relative; cursor: pointer; }
+        #flashcard-content { transition: background-color 0.3s ease, border-color 0.3s ease; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: auto; }
+        .card-question-style { background-color: #DBEAFE; border-color: #93C5FD; }
+        .card-answer-style { background-color: #D1FAE5; border-color: #6EE7B7; }
+        body { color: #e5e7eb; }
+        #card-text { color: #1f2937; }
+        #pile-to-learn-count, #pile-almost-count, #pile-learned-count { color: #1f2937; }
+        #all-cards-table-body td { color: #d1d5db; }
         #all-cards-table-body .status-learned { color: #34d399 !important; }
         #all-cards-table-body .status-almost { color: #f59e0b !important; }
         #all-cards-table-body .status-to_learn { color: #ef4444 !important; }
+        #unit-filter { background-color: #374151; color: #e5e7eb; border-color: #4b5563; }
     </style>
 </head>
 <body class="bg-gray-900 font-sans flex flex-col min-h-screen">
 
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-gray-800 text-gray-200 p-4 shadow-lg z-50 border-r border-gray-700">
         <button id="close-sidebar-btn" class="absolute top-2 right-2 text-gray-400 hover:text-white md:hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-        <h2 class="text-xl font-bold mb-6 text-white">Navegación</h2>
-        <nav class="flex flex-col space-y-3">
-            <button id="btn-view-study" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Estudiar</button>
-            <button id="btn-view-piles" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Pilas</button>
-            <button id="btn-view-all" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Todas</button>
-        </nav>
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+         </button>
+         <h2 class="text-xl font-bold mb-6 text-white">Navegación</h2>
+         <nav class="flex flex-col space-y-3">
+             <button id="btn-view-study" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Estudiar</button>
+             <button id="btn-view-piles" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Pilas</button>
+             <button id="btn-view-all" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Todas</button>
+         </nav>
     </aside>
 
     <div id="sidebar-overlay" class="fixed inset-0 bg-black z-40 md:hidden"></div>
 
     <div id="main-content" class="flex flex-col flex-grow transition-all duration-300 ease-in-out">
          <header class="bg-gray-800 text-white p-4 shadow-md flex items-center border-b border-gray-700">
-            <button id="open-sidebar-btn" class="text-gray-300 hover:text-white mr-4 md:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-            </button>
-            <h1 class="text-2xl font-bold text-center flex-grow">Estudio de Flashcards SIG</h1>
+             <button id="open-sidebar-btn" class="text-gray-300 hover:text-white mr-4 md:hidden">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+             </button>
+             <h1 class="text-2xl font-bold text-center flex-grow">Estudio de Flashcards SIG</h1>
         </header>
 
         <main class="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+
+             <div class="mb-6 max-w-xl mx-auto">
+                <label for="unit-filter" class="block text-sm font-medium text-gray-300 mb-1">Filtrar por Unidad:</label>
+                <select id="unit-filter" name="unit-filter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-700 text-gray-200">
+                    </select>
+            </div>
 
             <section id="view-study" class="">
                 <div id="study-area" class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl mx-auto text-center border border-gray-700">
                     <p id="progress-counter" class="text-sm text-gray-400 mb-4">Cargando...</p>
                     <div id="flashcard-container" class="flashcard-container h-64 mb-6">
                         <div id="flashcard-content" class="border rounded-lg shadow p-4 h-full">
-                             <p id="card-text" class="text-lg md:text-xl"></p> </div>
+                             <p id="card-text" class="text-lg md:text-xl"></p>
+                        </div>
                     </div>
-
                     <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
                         <button id="btn-not-learned" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto" disabled>No aprendido</button>
                         <button id="btn-almost" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto" disabled>Repasar</button>
                         <button id="btn-learned" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto" disabled>Aprendido</button>
                     </div>
                     <p id="study-complete-message" class="mt-6 text-green-400 font-semibold text-xl view-hidden">¡Felicidades! Has completado todas las tarjetas.</p>
+                     <p id="study-filtered-complete-message" class="mt-6 text-blue-400 font-semibold text-xl view-hidden">¡Felicidades! Has completado todas las tarjetas de esta unidad.</p>
                     <p id="loading-error-message" class="mt-6 text-red-400 font-semibold text-xl view-hidden">Error al procesar las tarjetas.</p>
+                     <p id="no-cards-for-filter-message" class="mt-6 text-yellow-400 font-semibold text-xl view-hidden">No hay tarjetas por estudiar para esta unidad.</p>
                 </div>
             </section>
 
             <section id="view-piles" class="view-hidden">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md mx-auto text-center border border-gray-700">
-                    <h2 class="text-xl font-semibold mb-4 text-white">Estado de las Pilas</h2>
+                 <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md mx-auto text-center border border-gray-700">
+                     <h2 class="text-xl font-semibold mb-1 text-white">Estado Global de las Pilas</h2>
+                     <p class="text-xs text-gray-400 mb-4">(Todas las unidades)</p>
                     <div class="space-y-3">
                         <div class="bg-red-200 p-3 rounded text-gray-900">Por Aprender: <span id="pile-to-learn-count" class="font-bold">0</span></div>
                         <div class="bg-yellow-200 p-3 rounded text-gray-900">Repasando: <span id="pile-almost-count" class="font-bold">0</span></div>
                         <div class="bg-green-200 p-3 rounded text-gray-900">Aprendido: <span id="pile-learned-count" class="font-bold">0</span></div>
                     </div>
                     <button id="btn-reset-progress" class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow">
-                        Reiniciar Progreso
+                        Reiniciar Progreso Global
                     </button>
                 </div>
             </section>
@@ -164,467 +128,558 @@
 
     <script>
         // --- Datos de Flashcards (Embebidos) ---
-        const flashcardsData = [ /* ... (mismos datos que antes) ... */
-             { "unidad": "III-B", "pregunta": "¿Cuál era la principal fuente de datos para los SIG en sus inicios y qué proceso era necesario?", "respuesta": "La principal fuente era la cartografía en papel. Era necesaria la digitalización para convertir los datos impresos a formato digital manejable por un SIG." },
-          { "unidad": "III-B", "pregunta": "¿Qué condiciona la forma en que los datos geográficos llegan a nosotros y el uso que les podemos dar en un SIG?", "respuesta": "La metodología seguida en la recolección de los datos geográficos condiciona directamente su forma y, por tanto, su uso o las operaciones necesarias para adaptarlos." },
-          { "unidad": "III-B", "pregunta": "Define datos geográficos digitales y analógicos.", "respuesta": "Digitales: Valores numéricos que alimentan una aplicación informática (SIG). Analógicos: Datos en formatos no digitales (mapas, fotos aéreas impresas, etc.)." },
-          { "unidad": "III-B", "pregunta": "Menciona las 5 ventajas principales de los datos digitales sobre los analógicos.", "respuesta": "1. Sencillez de actualización. 2. Facilidad de distribución. 3. Menor espacio de almacenamiento. 4. Mayor facilidad y precisión de análisis. 5. Facilidad de mantenimiento." },
-          { "unidad": "III-B", "pregunta": "Explica la diferencia entre fuentes primarias y secundarias de datos espaciales.", "respuesta": "Primarias: Datos que ya son utilizables en un SIG en su forma original (ej. imágenes digitales, GPS). Secundarias: Datos derivados de otros previos no adecuados directamente para SIG (ej. mapas digitalizados, levantamientos tradicionales)." },
-          { "unidad": "III-B", "pregunta": "¿Qué es la teledetección?", "respuesta": "Es el estudio y medida de las características de objetos (superficie terrestre) sin contacto físico, midiendo las perturbaciones (principalmente electromagnéticas) que provocan en su entorno." },
-          { "unidad": "III-B", "pregunta": "¿Cuáles son los 4 elementos del proceso de teledetección?", "respuesta": "1. Fuente de radiación (A). 2. Objetos que interaccionan/emiten radiación (B). 3. Atmósfera por donde viaja la radiación (C). 4. Receptor que recoge la radiación y genera una imagen (capa ráster) (D)." },
-          { "unidad": "III-B", "pregunta": "¿Qué son los Niveles Digitales en teledetección?", "respuesta": "Son valores enteros (usualmente 1-256) en las celdas de una imagen de teledetección que indican la intensidad de la radiación recibida." },
-          { "unidad": "III-B", "pregunta": "Define sensor y plataforma en teledetección.", "respuesta": "Sensor: Elemento que 'lee' la radiación electromagnética y registra su intensidad (ej. cámara, sensor multiespectral). Plataforma: Medio donde se sitúa el sensor (ej. avión, satélite)." },
-          { "unidad": "III-B", "pregunta": "¿Cuáles son las ventajas y desventajas de usar aviones como plataformas de teledetección?", "respuesta": "Ventajas: Mayor disponibilidad (se puede elegir cómo, cuándo, dónde volar). Desventajas: Inestabilidad, dependencia del clima, menor cobertura superficial que los satélites." },
-          { "unidad": "III-B", "pregunta": "¿Qué es la digitalización y qué tipos principales existen?", "respuesta": "Es el proceso de obtener un producto digital a partir de cartografía impresa (fuente secundaria). Tipos: Automática (escaneo, vectorización automática) y Manual (con tableta digitalizadora o en pantalla 'heads-up')." },
-          { "unidad": "III-B", "pregunta": "Compara ventajas y desventajas de la digitalización manual vs. automática (vectorial).", "respuesta": "Manual: Más costosa, precisión variable (depende del operario), pero reconocimiento fiable y permite corregir errores del original. Automática: Más rápida, precisión potencialmente alta ('clona' el original), pero no corrige errores y puede requerir mucha corrección posterior si el original no es ideal." },
-          { "unidad": "III-B", "pregunta": "¿Qué es una tableta digitalizadora?", "respuesta": "Es la herramienta tradicional fundamental para la digitalización manual vectorial, permitiendo trazar entidades sobre un mapa impreso fijado a ella." },
-          { "unidad": "III-B", "pregunta": "¿Qué es la digitalización en pantalla o 'heads-up'?", "respuesta": "Es la digitalización manual vectorial usando las herramientas de edición de un SIG para 'dibujar' entidades sobre una capa base digital (imagen escaneada, foto aérea digital, etc.) visualizada en la pantalla." },
-          { "unidad": "III-B", "pregunta": "¿Qué es el escaneo y qué dispositivo utiliza?", "respuesta": "Es el proceso de digitalización automática que convierte una imagen impresa en una imagen digital (capa ráster). Utiliza un escáner." },
-          { "unidad": "III-B", "pregunta": "¿Cuáles son los parámetros básicos de un escáner?", "respuesta": "Resolución espacial (puntos por pulgada - ppp) y resolución radiométrica (capacidad de distinguir colores)." },
-          { "unidad": "III-B", "pregunta": "¿Qué es la vectorización automática?", "respuesta": "Es un proceso que obtiene una capa vectorial a partir de cartografía impresa (o una imagen digital de esta) sin que el operario trace manualmente las entidades, mediante reconocimiento de patrones." },
-          { "unidad": "III-B", "pregunta": "¿Qué es la geocodificación y un ejemplo común?", "respuesta": "Es la asignación de coordenadas a puntos de interés a partir de información alfanumérica (sin un mapa gráfico previo). Ejemplo: asignar coordenadas a direcciones postales." },
-          { "unidad": "III-B", "pregunta": "¿Qué es la fotogrametría?", "respuesta": "Es la técnica para estudiar y definir con precisión la forma, dimensiones y posición de un objeto usando medidas sobre fotografías (aéreas en el contexto SIG)." },
-          { "unidad": "III-B", "pregunta": "¿Cuáles son los tipos de fotogrametría según su evolución?", "respuesta": "Analógica (imágenes analógicas), Analítica (formulaciones matemáticas y computación) y Digital (imágenes digitales en entorno computarizado)." },
-          { "unidad": "III-B", "pregunta": "¿Qué es un GNSS y cuál es el más conocido?", "respuesta": "GNSS (Sistemas Globales de Navegación por Satélite) permite conocer la localización exacta en cualquier punto del globo. El más conocido es el GPS (Sistema de Posicionamiento Global)." },
-          { "unidad": "III-B", "pregunta": "¿Cuáles son los tres segmentos del sistema GPS?", "respuesta": "1. Segmento espacial (satélites). 2. Segmento de control (estaciones terrestres). 3. Segmento de usuarios (receptores GPS)." },
-          { "unidad": "III-B", "pregunta": "¿En qué se basa el cálculo de posición del GPS y qué sistema de referencia usa?", "respuesta": "Se basa en la triangulación de la posición (x, y, z) mediante señales y distancias a varios satélites. Utiliza el sistema geodésico WGS84." },
-          { "unidad": "III-B", "pregunta": "Menciona algunas fuentes de error en el sistema GPS.", "respuesta": "Errores en posición de satélites, rebote de señal (multitrayectoria), paso por la atmósfera (ionosfera, troposfera), precisión de relojes, disponibilidad selectiva (eliminada en 2000)." },
-          { "unidad": "III-B", "pregunta": "Describe los tipos principales de receptores GPS según su uso.", "respuesta": "1. Uso general (bajo coste, portátiles, para ocio, navegación). 2. Medición topográfica (mayor precisión, antena externa, uso profesional SIG). 3. Medición del tiempo (fijos, alta precisión temporal)." },
-          { "unidad": "III-B", "pregunta": "¿Cómo se integra el GPS con los SIG?", "respuesta": "Como fuente de datos estática (crear capas a partir de datos de campo) o para obtención de datos en tiempo real (SIG móviles). Permite capturar componente espacial y, a menudo, temática (atributos)." },
-          { "unidad": "III-B", "pregunta": "¿Qué es la Información Geográfica Voluntaria (VGI) o Participativa?", "respuesta": "Es el uso de Internet para crear, gestionar y difundir información geográfica aportada voluntariamente por usuarios (neogeografía), democratizando la creación cartográfica." },
-          { "unidad": "III-B", "pregunta": "¿Cuáles son algunas críticas o problemas asociados a la VGI?", "respuesta": "La calidad de la información puede ser variable al provenir de no expertos y usar equipo de bajo coste, aunque para certos tipos de datos (ej. puntos de interés) puede ser suficiente." },
-          { "unidad": "III-B", "pregunta": "¿Por qué es importante la cartografía de elevaciones en SIG?", "respuesta": "Porque casi todos los procesos estudiados en SIG tienen relación con el relieve, y una capa de elevación aporta amplia información sobre ellos." },
-          { "unidad": "III-B", "pregunta": "Enumera las metodologías mencionadas para obtener cartografía de elevaciones.", "respuesta": "GPS, Digitalización de curvas de nivel, Estereografía, Interferometría (Radar, SRTM), LIDAR." },
-          { "unidad": "III-B", "pregunta": "¿Qué es un archivo 'World File' y para qué sirve?", "respuesta": "Es un pequeño archivo de texto plano que acompaña a un archivo de imagen y contiene los datos de georreferencia (tamaño de píxel, coordenadas de esquina, rotación) para que el SIG pueda ubicarla espacialmente. Su extensión se forma con la primera y última letra de la extensión de la imagen + 'w' (ej. .tfw para .tif)." },
-          { "unidad": "III-B", "pregunta": "Explica la diferencia entre compresión con pérdidas y sin pérdidas en imágenes.", "respuesta": "Sin pérdidas: Recupera la imagen exacta, sin degradación (ej. Run-Length). Con pérdidas: Pierde información para lograr mayor compresión, la imagen resultante es similar pero no idéntica (ej. JPEG, ECW)." },
-          { "unidad": "III-B", "pregunta": "¿Qué formato ráster común soporta una única banda y valor 'sin datos' en ASCII?", "respuesta": "ArcInfo ASCII (.asc)." },
-          { "unidad": "III-B", "pregunta": "Describe brevemente el formato TIFF/GeoTIFF.", "respuesta": "TIFF (.tif): Formato flexible, muchas variantes, puede usar compresión con/sin pérdidas, apto para imágenes y otros datos ráster (valores decimales). GeoTIFF: Variante que incluye georreferencia en el propio archivo." },
-          { "unidad": "III-B", "pregunta": "Describe brevemente los formatos ECW y MrSID.", "respuesta": "ECW (.ecw): Compresión con pérdidas, optimizado para imágenes grandes (aéreas/satélite), permite descompresión selectiva. MrSID (.sid): Similar a ECW (alta compresión, para imágenes grandes, descompresión selectiva) pero es un formato cerrado." },
-          { "unidad": "III-B", "pregunta": "¿Qué dos aspectos principales diferencian los formatos de archivo vectoriales?", "respuesta": "1. Capacidad para recoger la topología de la capa. 2. Capacidad para recoger los atributos temáticos de las entidades (limitada en formatos CAD)." },
-          { "unidad": "III-B", "pregunta": "Describe brevemente el formato Shapefile (.shp).", "respuesta": "Propuesto por ESRI, estándar de facto. No soporta topología directamente. Se compone de varios archivos (.shp, .shx, .dbf, etc.) que almacenan geometría, índices, atributos." },
-          { "unidad": "III-B", "pregunta": "Describe brevemente los formatos DWG y DXF.", "respuesta": "DWG: Formato nativo de AutoCAD (CAD), cerrado, almacena datos 2D/3D y metadatos. DXF: También de AutoCAD, especificaciones públicas, para interoperabilidad CAD, menos complejo que DWG, muy usado para cartografía." },
-          { "unidad": "III-B", "pregunta": "¿Cómo se manejaban los datos en los SIG de primera generación?", "respuesta": "Mediante archivos con formatos cerrados, vinculados al software específico, sin un SGBD estructurado. El propio SIG gestionaba el acceso y edición." },
-          { "unidad": "III-B", "pregunta": "Describe la arquitectura dual en los SIG de segunda generación.", "respuesta": "El SGBD relacional estándar gestionaba solo la componente temática. La componente espacial era gestionada por el propio SIG. Había dos subsistemas separados." },
-          { "unidad": "III-B", "pregunta": "Describe la arquitectura en capas en los SIG de segunda generación y sus dos alternativas.", "respuesta": "Toda la información (espacial y temática) se almacenaba en un SGBD relacional estándar. Alternativas: 1. Almacenamiento transparente (usa tipos de datos y SQL del SGBD). 2. Almacenamiento opaco (usa objetos binarios, operaciones implementadas en el SIG)." },
-          { "unidad": "III-B", "pregunta": "¿Cómo manejan los datos los SIG de tercera generación?", "respuesta": "Utilizan bases de datos con arquitecturas extensibles (orientadas a objetos o relacionales con extensiones espaciales como PostGIS, Oracle Spatial, etc.) que pueden definir y manejar tipos de datos espaciales y operaciones específicas de forma nativa y optimizada." },
-          { "unidad": "III-B", "pregunta": "Menciona SGBD Open Source con soporte espacial.", "respuesta": "PostgreSQL + PostGIS, SQLite + SpatiaLite, MySQL (con funciones espaciales)." },
-          { "unidad": "III-B", "pregunta": "Enumera las formas mencionadas para la captura de datos geográficos.", "respuesta": "Levantamientos fotogramétricos, imágenes de satélite, medidas GPS/Glonass/Galileo, Sensores, Levantamientos topográficos, Informes escritos/tablas/listas (con componente espacial)." },
-          { "unidad": "IV-A", "pregunta": "¿Por qué se dice que los SIG son herramientas versátiles?", "respuesta": "Porque pueden adaptarse a circunstancias particulares de muchas disciplinas, utilizando prioritariamente distintas capacidades (análisis, visualización, manejo de datos) según las necesidades." },
-          { "unidad": "IV-A", "pregunta": "¿Qué porcentaje estimado de bases de datos administrativas son susceptibles de ser georreferenciadas?", "respuesta": "Más del 80%." },
-          { "unidad": "IV-A", "pregunta": "Menciona algunos factores para clasificar los ámbitos de aplicación de los SIG.", "respuesta": "Procesos de interés, tipo de datos, volumen de datos, precisión necesaria, tipo de usuarios, complejidad de operaciones, adecuación del SIG a las necesidades." },
-          { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta modelizadora.", "respuesta": "Permite modelizar realidades geográficas complexas combinando análisis sencillos en flujos de trabajo, adecuados para modelos conceptuales/matemáticos, estáticos/dinámicos." },
-          { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta para la toma de decisiones.", "respuesta": "Facilita combinar y visualizar globalmente múltiples variables (capas) para generar resultados que apoyen la interpretación de expertos y la toma de decisiones informadas." },
-          { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta para la difusión de información geográfica.", "respuesta": "Permite exponer datos geográficos de forma óptima a públicos amplios (incluyendo no técnicos vía web), añadiendo valor espacial a la información." },
-          { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta centralizadora.", "respuesta": "Actúa como sistema para gestionar y coordinar información geográfica y tareas de equipos en organizaciones (ej. SIG corporativo), donde la gestión de la base de datos es vital." },
-          { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en la Gestión de Recursos Naturales.", "respuesta": "Campo pionero en SIG. Herramienta excepcional para gestionar y explotar gran cantidad de datos variados (vector/ráster) sobre recursos naturales, con fuerte componente de análisis." },
-          { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en la Gestión de Riesgos.", "respuesta": "Análisis de distribución y probabilidad de riesgos (naturales/humanos). Uso principal de datos ráster (variables continuas) y vectoriales (registros de eventos). Usuarios avanzados." },
-          { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en Ecología.", "respuesta": "Gestión de datos de campo, creación de cartografía, modelización de comportamientos y distribuciones espaciales (migraciones, dispersión). Uso de visualización y análisis." },
-          { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en Negocios y Marketing.", "respuesta": "Análisis espacial para optimizar actividades de mercado: localización óptima, análisis de competencia, predicción de evolución, elaboración de informes y mapas comerciales." },
-          { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en Ciencias Sociales.", "respuesta": "Estudio de relaciones humanas y comunitarias vinculadas al espacio. Uso de análisis espacial y geoestadística para extraer conclusiones y elaborar hipótesis." },
-          { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en Planificación.", "respuesta": "Herramienta imprescindible para combinar múltiples factores y capas en la selección de emplazamientos óptimos, maximizando beneficios y minimizando impactos. Ayuda a la toma de decisiones." },
-          { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en el Ámbito Militar.", "respuesta": "Herramienta valiosa desde sus inicios por la importancia de la información espacial. Uso intensivo del análisis para estudio de alternativas y escenarios, pero también edición y cartografía." },
-          { "unidad": "IV-A", "pregunta": "Menciona algunas áreas específicas de aplicación de SIG (más detalladas).", "respuesta": "Hidrografía, Jardinería, Agricultura (de precisión), Medio ambiente, Agraria, Geodesia/Topografía, Navegación/Transporte, Comunicación, Energía, Administración/Gestión (urbanística, servicios), Catastro, Planificación usos del suelo, Adm. Propiedades, Arqueología, Emergencias, Forestal, Turismo/Recreación, Seguimiento/Análisis, Salud, Educación, Seguridad." },
-          { "unidad": "IV-A", "pregunta": "¿Qué es la Semiología Gráfica?", "respuesta": "Ciencia que estudia los sistemas de signos visuales (gráficos) y su significado, definiendo una 'gramática' para comprender cómo transmiten información (según Jacques Bertin)." },
-          { "unidad": "IV-A", "pregunta": "Enumera las 7 variables visuales según Bertin.", "respuesta": "Posición, Tamaño, Forma, Textura, Tono (Color), Valor (Color), Orientación." },
-          { "unidad": "IV-A", "pregunta": "¿Por qué la variable visual 'Posición' tiene un uso restringido en cartografía?", "respuesta": "Porque en un mapa, la posición del símbolo ya está determinada por la ubicación geográfica real del objeto que representa, no se puede alterar libremente para transmitir otra información." },
-          { "unidad": "IV-A", "pregunta": "¿A qué tipo de símbolos se aplica fundamentalmente la variable 'Forma'?", "respuesta": "Principalmente a símbolos puntuales. Su aplicación a líneas es difícil y a superficies requiere alterar la forma del polígono (cartogramas) o usar un relleno con formas." },
-          { "unidad": "IV-A", "pregunta": "¿Cómo se aplica la variable 'Tamaño' a símbolos puntuales, lineales y de superficie?", "respuesta": "Puntuales: Variando el tamaño del símbolo. Lineales: Variando el grosor de la línea. Superficies: Alterando el tamaño del polígono (cartogramas) o variando el tamaño de la trama en la textura de relleno." },
-          { "unidad": "IV-A", "pregunta": "Define Tono, Valor y Saturación como componentes del color (espacio HSV).", "respuesta": "Tono (Hue): El color en sí (rojo, verde...). Valor (Value): Claridad/oscuridad del color. Saturación (Saturation): Pureza/intensidad del color (vs. grisáceo)." },
-          { "unidad": "IV-A", "pregunta": "¿Qué componentes del color se usan principalmente como variables visuales en cartografía?", "respuesta": "El Tono y el Valor. La Saturación tiene un uso muy limitado." },
-          { "unidad": "IV-A", "pregunta": "¿Cómo se aplica la variable 'Textura' a símbolos puntuales, lineales y de superficie?", "respuesta": "Puntuales: Relleno con un patrón (requiere tamaño suficiente). Lineales: Patrón de discontinuidad (guiones/espacios) o relleno si es gruesa (no recomendado). Superficies: Relleno con un patrón (uso más efectivo)." },
-          { "unidad": "IV-A", "pregunta": "¿Cómo se aplica la variable 'Orientación'?", "respuesta": "Principalmente a símbolos puntuales no simétricos (formas geométricas). Puede aplicarse a texturas en líneas (si son anchas) o superficies." },
-          { "unidad": "IV-A", "pregunta": "Define las 4 propiedades de las variables visuales: Asociativa, Selectiva, Ordenada, Cuantitativa.", "respuesta": "Asociativa: No altera la visibilidad/importancia. Selectiva: Permite agrupar en categorías. Ordenada: Permite representar un orden visual. Cuantitativa: Permite estimar cantidades/proporciones visualmente." },
-          { "unidad": "IV-A", "pregunta": "¿Qué variables visuales NO presentan la propiedad Asociativa (es decir, son disociativas)?", "respuesta": "El Tamaño y el Valor (un tamaño mayor o un valor más oscuro destacan más)." },
-          { "unidad": "IV-A", "pregunta": "¿Qué variable visual presenta más claramente la propiedad Selectiva?", "respuesta": "El Tono (color)." },
-          { "unidad": "IV-A", "pregunta": "¿Qué variables visuales presentan la propiedad Ordenada?", "respuesta": "Posición, Valor, Tamaño y Textura (si las tramas varían ordenadamente)." },
-          { "unidad": "IV-A", "pregunta": "¿Qué variables visuales presentan la propiedad Cuantitativa?", "respuesta": "Exclusivamente el Tamaño y la Posición." },
-          { "unidad": "IV-A", "pregunta": "¿Se puede usar el Tono para representar orden? Explica.", "respuesta": "Según Bertin, no tiene la propiedad ordenada. Sin embargo, en la práctica sí se puede si se usa una secuencia de tonos con una lógica culturalmente aceptada (ej. azul-frío a rojo-cálido para temperatura)." },
-          { "unidad": "IV-A", "pregunta": "¿Qué es un mapa?", "respuesta": "Una representación gráfica a escala, generalmente plana, de una parte de la superficie terrestre, mostrando la situación de objetos geográficos y considerando diversas condiciones (culturales, geofísicas, etc.)." },
-          { "unidad": "IV-A", "pregunta": "Diferencia entre mapa, carta y plano.", "respuesta": "Mapa: Representación general a escala. Carta: Mapa con ayudas específicas para la navegación. Plano: Representación a escala muy grande (mucho detalle) de un área pequeña, usando técnicas topográficas." },
-          { "unidad": "IV-A", "pregunta": "¿Qué es la Cartografía?", "respuesta": "El arte, ciencia y tecnología que intervienen en la elaboración de mapas y cartas." },
-          { "unidad": "IV-A", "pregunta": "¿Cuáles son las 4 etapas del proceso cartográfico?", "respuesta": "1. Recoger datos. 2. Manipular y generalizar datos (diseñar y construir mapa). 3. Visualizar el mapa. 4. Interpretar la información." },
-          { "unidad": "IV-A", "pregunta": "¿Qué es el diseño cartográfico?", "respuesta": "El conjunto de ideas y decisiones (simplificación, generalización, simbología) que toma el cartógrafo para crear un mapa efectivo." },
-          { "unidad": "IV-A", "pregunta": "¿Por qué es importante considerar el propósito y el usuario al crear un mapa?", "respuesta": "Porque un mapa técnicamente correcto puede ser inútil si no se adapta a quién lo va a usar y para qué, eligiendo elementos (escala, proyección, tipo de mapa, simbología) y nivel de complejidad adecuados." },
-          { "unidad": "IV-A", "pregunta": "Define Cartografía Base (o topográfica).", "respuesta": "Representa los principales elementos físicos de la superficie terrestre (vías, hidrografía, relieve, poblaciones) con precisión y localización. Objeto original de la cartografía." },
-          { "unidad": "IV-A", "pregunta": "Define Cartografía Temática.", "respuesta": "Se centra en representar un tema o variable espacial concreta (física, social, política, etc.), usando la cartografía base como referencia geográfica." },
-          { "unidad": "IV-A", "pregunta": "¿Cuáles son las dos partes diferenciadas de un mapa temático?", "respuesta": "1. Capa específica con la información temática. 2. Mapa base (con elementos de cartografía base simplificados) para dar localización geográfica." },
-          { "unidad": "IV-A", "pregunta": "Diferencia entre información cualitativa y cuantitativa en cartografía temática.", "respuesta": "Cualitativa: Tipos nominal y alfanumérico (categorías sin orden inherente). Cuantitativa: Tipos ordinal, intervalos y razones (valores numéricos con orden o magnitud)." },
-          { "unidad": "IV-A", "pregunta": "¿Qué variables visuales son adecuadas para información nominal/cualitativa?", "respuesta": "Forma (símbolos), Tono (colores distintos) o Textura. Se busca la propiedad selectiva." },
-          { "unidad": "IV-A", "pregunta": "¿Qué variables visuales son adecuadas para información ordinal/cuantitativa?", "respuesta": "Valor (gama de claridad/oscuridad) o Tamaño. Se busca la propiedad ordenada (y cuantitativa para razones/intervalos, donde el Tamaño es ideal)." },
-          { "unidad": "IV-A", "pregunta": "Enumera los elementos fundamentales que componen un mapa (layout).", "respuesta": "Título, Autor/Fuente, Canevás, Leyenda, Escala (numérica y gráfica), Norte, Localizador, (Opcional: Mapas de detalle, otra información)." },
-          { "unidad": "IV-A", "pregunta": "¿Qué consideraciones hay sobre la leyenda en un mapa?", "respuesta": "Debe ser clara y fácil de interpretar. Evitar precisión innecesaria en rangos numéricos. No separarla del mapa con un cuadro si no es necesario." },
-          { "unidad": "IV-A", "pregunta": "¿Qué elementos del mapa son menos necesarios en la visualización dinámica de un SIG?", "respuesta": "Autor, escala gráfica (hay herramientas de medida), canevás (mejor un localizador interactivo)." },
-          { "unidad": "IV-A", "pregunta": "¿Cuál es la premisa fundamental al disponer los elementos en el lienzo del mapa?", "respuesta": "Maximizar la claridad y aprovechar óptimamente el espacio disponible, evitando zonas en blanco." },
-          { "unidad": "IV-A", "pregunta": "¿Qué es el centro óptico de un mapa y dónde se sitúa?", "respuesta": "Es el punto focal visual del mapa, situado ligeramente por encima del centro geométrico (aprox. 5% de la altura)." },
-          { "unidad": "IV-A", "pregunta": "¿Qué zonas del mapa tienen mayor importancia visual?", "respuesta": "La parte superior y la parte izquierda." },
-          { "unidad": "IV-A", "pregunta": "¿Cuál es la dirección natural de la atención del lector en un mapa?", "respuesta": "Desde la esquina superior izquierda hasta la inferior derecha, pasando por el centro óptico." },
-          { "unidad": "IV-A", "pregunta": "¿Qué factores influyen en el 'peso visual' de un elemento en el mapa?", "respuesta": "Posición (más peso a la derecha, arriba, lejos del centro), Tamaño (mayor tamaño, más peso), Color (brillantes, rojo>azul), Aislamiento, Forma (regulares, compactas), Dirección (si apuntan a otros)." },
-          { "unidad": "IV-A", "pregunta": "Define mapa temático cuantitativo y cualitativo.", "respuesta": "Cuantitativo: Muestra información organizada o distribuciones numéricas. Cualitativo: Muestra información organizada en clases/categorías." },
-          { "unidad": "IV-B", "pregunta": "¿Qué es el Catastro según el diccionario?", "respuesta": "Es el censo y padrón estadístico de los inmuebles/parcelas rústicas y urbanas, describiendo la propiedad inmobiliaria." },
-          { "unidad": "IV-B", "pregunta": "Menciona algunas funciones del catastro.", "respuesta": "Captura/mantenimiento/suministro de info. de inmuebles y titulares; renovar inventario; regir información adecuada; administrar info. de edificaciones; proveer herramienta de recursos financieros." },
-          { "unidad": "IV-B", "pregunta": "¿Cuáles son los dos enfoques del catastro como herramienta para la población?", "respuesta": "1. Permite a municipios obtener recursos para dar mejores servicios. 2. Proporciona seguridad sobre la propiedad privada." },
-          { "unidad": "IV-B", "pregunta": "Enumera algunos usos principales de la información catastral (SIC).", "respuesta": "Fiscal (impuestos), reducción de procesos administrativos, reordenamiento urbano, manejo de información gráfica/alfanumérica de parcelas, base para registro de propiedad, diseño de infraestructuras, calidad de materiales constructivos." },
-          { "unidad": "IV-B", "pregunta": "¿Cuál es la principal razón por la que la información catastral tiene poco uso más allá de ser cartografía base, a pesar de su disponibilidad?", "respuesta": "La dificultad técnica para explotar los datos, que requiere conocimientos sobre su estructura y qué información se puede extraer." },
-          { "unidad": "IV-B", "pregunta": "¿Por qué un gobierno municipal debería tener un Sistema de Información Catastral moderno (digital)?", "respuesta": "Para integrar y sistematizar toda la información catastral, fortaleciendo sus dependencias y permitiendo una mejor gestión y toma de decisiones." },
-          { "unidad": "IV-B", "pregunta": "¿Cómo ayudan los SIG al catastro?", "respuesta": "Permiten estructurar, visualizar y gestionar información espacialmente, asociando datos diversos al territorio, mejorando la planificación, la calidad del servicio y la eficiencia." },
-          { "unidad": "IV-B", "pregunta": "¿Qué componentes integran la plena identificación catastral?", "respuesta": "La suma de información cartográfica (SIG) e información alfanumérica descriptiva (suelo, construcciones)." },
-          { "unidad": "IV-B", "pregunta": "Menciona algunas explotaciones específicas de los datos catastrales usando SIG.", "respuesta": "Análisis físico (dimensiones, formas); análisis temporal (antigüedad edificios); análisis de usos del suelo (geomarketing); planeamiento urbanístico (alturas, edificabilidad, inventario suelo); demografía (estimación población por parcela)." },
-          { "unidad": "IV-B", "pregunta": "¿Qué permite la construcción de modelos 3D catastrales?", "respuesta": "Inventariar la información catastral de los inmuebles con detalle tridimensional, garantizando la plena identificación en ciudades complexas." },
-          { "unidad": "IV-B", "pregunta": "¿Cuál era la limitación de almacenar información catastral jurídica, económica y física solo en bases de datos alfanuméricas?", "respuesta": "La dificultad de relacionarla con el territorio donde se ubican los inmuebles." },
-          { "unidad": "IV-B", "pregunta": "¿Qué beneficios aporta la integración de bases de datos geográficas (BDG) y alfanuméricas (BDA) en un SIG Catastral?", "respuesta": "Garantiza integridad, consistencia y veracidad de la información; permite cálculo automatizado de áreas; posibilita ubicación espacial y relación entre inmuebles." },
-          { "unidad": "IV-B", "pregunta": "¿Por qué es fundamental registrar los cambios catastrales en el tiempo?", "respuesta": "Porque la dinámica inmobiliaria es constante y registrarla permite ver la evolución de los predios, analizarla en retrospectiva y tomar decisiones de planificación futuras." },
-          { "unidad": "IV-B", "pregunta": "Describe las características de un Sistema de Información Catastral (SIC) moderno.", "respuesta": "Mantiene datos físicos/jurídicos/económicos; base de datos al servicio de titulares y administraciones; gestión informatizada; actualización constante (declaraciones, revisiones, notarías); responsabilidad de Gerencias Territoriales; colaboración con Adm. Locales; incluye subsistema de gestión alfanumérico y subsistema geográfico (SIG); conectado a BD Nacional." },
-          { "unidad": "IV-B", "pregunta": "Define Escala Cartográfica.", "respuesta": "Es la relación entre las dimensiones de los objetos en el mapa y sus dimensiones reales en el terreno." },
-          { "unidad": "IV-B", "pregunta": "¿Cómo se expresa matemáticamente la escala?", "respuesta": "1/E = Dm/Dt (donde E=Escala, Dm=Distancia mapa, Dt=Distancia terreno)." },
-          { "unidad": "IV-B", "pregunta": "¿Qué es la Unidad Mínima Cartografiable (UMC)?", "respuesta": "El tamaño mínimo real que debe tener un objeto para poder ser representado en un mapa a una escala dada (o según el uso previsto)." },
-          { "unidad": "IV-B", "pregunta": "¿Cuáles son las tres formas de expresar la escala en un mapa?", "respuesta": "Textual (ej. 'un cm representa 600 km'), Numérica (ej. 1:10,000), Gráfica (barra dividida)." },
-          { "unidad": "IV-B", "pregunta": "¿Por qué es importante incluir siempre la escala gráfica en un mapa impreso?", "respuesta": "Porque si el mapa sufre cambios de tamaño (ampliación/reducción), la escala gráfica mantiene la proporción correcta, mientras que la numérica quedaría incorrecta." },
-          { "unidad": "IV-B", "pregunta": "Explica qué significa una escala 1:20,000.", "respuesta": "Significa que 1 unidad de medida en el mapa representa 20,000 de esas mismas unidades en el terreno (ej. 1 cm en mapa = 20,000 cm en terreno)." },
-          { "unidad": "IV-B", "pregunta": "En cartografía, ¿una escala 1:25,000 es mayor o menor que 1:50,000?", "respuesta": "1:25,000 es una escala MAYOR (muestra más detalle, menos área) que 1:50,000 (escala MENOR, muestra menos detalle, más área)." },
-          { "unidad": "IV-B", "pregunta": "¿Qué es la generalización cartográfica y cuándo se aplica?", "respuesta": "Es la simplificación de la información al pasar a una escala menor (ej. de 1:25,000 a 1:50,000), eliminando o simplificando detalles según la nueva UMC." },
-          { "unidad": "IV-B", "pregunta": "¿Qué ocurre si se amplía un mapa a una escala mayor que la original en un SIG?", "respuesta": "La precisión no aumenta, la visualización puede verse extraña (poca densidad de entidades, se ven vértices) porque no se añade nueva información." },
-          { "unidad": "IV-B", "pregunta": "Define Escala de Análisis.", "respuesta": "Es el nivel o extensión espacial que se considera al estudiar un fenómeno geográfico. Afecta a la percepción de estructuras espaciales y a los resultados del análisis." },
-          { "unidad": "IV-B", "pregunta": "¿Por qué la longitud medida de una costa o un camino puede variar según la 'vara de medir' (escala de análisis)?", "respuesta": "Porque una unidad de medida más pequeña captura más detalles (sinuosidades) de la línea, resultando en una longitud total mayor. La medida absoluta carece de sentido sin especificar la escala." },
-          { "unidad": "IV-B", "pregunta": "¿Cómo afecta la resolución espacial (tamaño de celda) de un dato ráster a la escala de análisis?", "respuesta": "La resolución espacial condiciona la escala mínima de análisis. Detalles o variaciones más pequeños que el tamaño de celda no pueden ser capturados ni analizados." },
-          { "unidad": "IV-B", "pregunta": "Define Precisión en el contexto de imágenes geográficas.", "respuesta": "Es la certeza con la que un objeto está ubicado en el terreno donde aparece en la imagen. Se expresa a menudo en píxeles (convertibles a metros según la resolución)." },
-          { "unidad": "IV-B", "pregunta": "¿Qué relación existe entre resolución de imagen y escala topográfica típica?", "respuesta": "A mayor resolución (píxel más pequeño en metros), corresponde una escala topográfica mayor (más detalle). Ej: 1m res -> 1:2,000; 30m res -> 1:80,000." },
-          { "unidad": "IV-B", "pregunta": "Menciona estrategias para controlar errores y mantener la precisión en un proyecto SIG.", "respuesta": "1. Usar datos de partida precisos y con calidad documentada (metadatos). 2. Minimizar la propagación de errores estructurando adecuadamente los procesos (operaciones más propensas al error al final)." },
-          { "unidad": "IV-B", "pregunta": "Enumera ideas para evitar errores y pérdida de precisión en SIG.", "respuesta": "Evitar mezclar capas de orígenes/formatos dispares sin control; ser consciente de que precisión disminuye con resolución; la precisión final no supera la del dato menos preciso; menos capas en análisis = menos oportunidad de error." },
-          { "unidad": "IV-B", "pregunta": "¿Por qué son importantes los metadatos en relación a la precisión?", "respuesta": "Porque documentan la calidad, origen y precisión de los datos SIG, información que a menudo se ignora pero es crucial para evaluar la fiabilidad de los resultados." },
-          { "unidad": "IV-B", "pregunta": "¿Qué son las Proyecciones Cartográficas?", "respuesta": "Son transformaciones matemáticas para representar la superficie curva de la Tierra en un plano (mapa), introduciendo inevitablemente distorsiones (área, forma, distancia, ángulo)." },
-          { "unidad": "IV-B", "pregunta": "¿Qué aspectos considerar al elegir una proyección?", "respuesta": "Tamaño del área (global vs local), localización (ecuador, polos, lat. medias), forma del área, propósito del mapa (conservar áreas, formas, distancias, etc.)." },
-          { "unidad": "IV-B", "pregunta": "Diferencia entre Conversión y Transformación de coordenadas.", "respuesta": "Conversión: Entre sistemas con el mismo datum (exacta). Transformación: Entre sistemas con diferente datum (más compleja, puede no ser exacta)." },
-          { "unidad": "IV-B", "pregunta": "¿Cómo manejan los SIG los diferentes sistemas de coordenadas?", "respuesta": "Incorporan funciones para cambiar coordenadas (conversión/transformación) o realizan transformaciones 'al vuelo' (en tiempo real) si los datos tienen definida su proyección original." }
+        // ***** DATOS COMPLETOS (ORIGINALES + PDF VÁLIDOS) *****
+        const flashcardsData = [
+            // --- Unidad III-B (Originales) ---
+            { "unidad": "III-B", "pregunta": "¿Cuál era la principal fuente de datos para los SIG en sus inicios y qué proceso era necesario?", "respuesta": "La principal fuente era la cartografía en papel. Era necesaria la digitalización para convertir los datos impresos a formato digital manejable por un SIG." },
+            { "unidad": "III-B", "pregunta": "¿Qué condiciona la forma en que los datos geográficos llegan a nosotros y el uso que les podemos dar en un SIG?", "respuesta": "La metodología seguida en la recolección de los datos geográficos condiciona directamente su forma y, por tanto, su uso o las operaciones necesarias para adaptarlos." },
+            { "unidad": "III-B", "pregunta": "Define datos geográficos digitales y analógicos.", "respuesta": "Digitales: Valores numéricos que alimentan una aplicación informática (SIG). Analógicos: Datos en formatos no digitales (mapas, fotos aéreas impresas, etc.)." },
+            { "unidad": "III-B", "pregunta": "Menciona las 5 ventajas principales de los datos digitales sobre los analógicos.", "respuesta": "1. Sencillez de actualización. 2. Facilidad de distribución. 3. Menor espacio de almacenamiento. 4. Mayor facilidad y precisión de análisis. 5. Facilidad de mantenimiento." },
+            { "unidad": "III-B", "pregunta": "Explica la diferencia entre fuentes primarias y secundarias de datos espaciales.", "respuesta": "Primarias: Datos que ya son utilizables en un SIG en su forma original (ej. imágenes digitales, GPS). Secundarias: Datos derivados de otros previos no adecuados directamente para SIG (ej. mapas digitalizados, levantamientos tradicionales)." },
+            { "unidad": "III-B", "pregunta": "¿Qué es la teledetección?", "respuesta": "Es el estudio y medida de las características de objetos (superficie terrestre) sin contacto físico, midiendo las perturbaciones (principalmente electromagnéticas) que provocan en su entorno." },
+            { "unidad": "III-B", "pregunta": "¿Cuáles son los 4 elementos del proceso de teledetección?", "respuesta": "1. Fuente de radiación (A). 2. Objetos que interaccionan/emiten radiación (B). 3. Atmósfera por donde viaja la radiación (C). 4. Receptor que recoge la radiación y genera una imagen (capa ráster) (D)." },
+            { "unidad": "III-B", "pregunta": "¿Qué son los Niveles Digitales en teledetección?", "respuesta": "Son valores enteros (usualmente 1-256) en las celdas de una imagen de teledetección que indican la intensidad de la radiación recibida." },
+            { "unidad": "III-B", "pregunta": "Define sensor y plataforma en teledetección.", "respuesta": "Sensor: Elemento que 'lee' la radiación electromagnética y registra su intensidad (ej. cámara, sensor multiespectral). Plataforma: Medio donde se sitúa el sensor (ej. avión, satélite)." },
+            { "unidad": "III-B", "pregunta": "¿Cuáles son las ventajas y desventajas de usar aviones como plataformas de teledetección?", "respuesta": "Ventajas: Mayor disponibilidad (se puede elegir cómo, cuándo, dónde volar). Desventajas: Inestabilidad, dependencia del clima, menor cobertura superficial que los satélites." },
+            { "unidad": "III-B", "pregunta": "¿Qué es la digitalización y qué tipos principales existen?", "respuesta": "Es el proceso de obtener un producto digital a partir de cartografía impresa (fuente secundaria). Tipos: Automática (escaneo, vectorización automática) y Manual (con tableta digitalizadora o en pantalla 'heads-up')." },
+            { "unidad": "III-B", "pregunta": "Compara ventajas y desventajas de la digitalización manual vs. automática (vectorial).", "respuesta": "Manual: Más costosa, precisión variable (depende del operario), pero reconocimiento fiable y permite corregir errores del original. Automática: Más rápida, precisión potencialmente alta ('clona' el original), pero no corrige errores y puede requerir mucha corrección posterior si el original no es ideal." },
+            { "unidad": "III-B", "pregunta": "¿Qué es una tableta digitalizadora?", "respuesta": "Es la herramienta tradicional fundamental para la digitalización manual vectorial, permitiendo trazar entidades sobre un mapa impreso fijado a ella." },
+            { "unidad": "III-B", "pregunta": "¿Qué es la digitalización en pantalla o 'heads-up'?", "respuesta": "Es la digitalización manual vectorial usando las herramientas de edición de un SIG para 'dibujar' entidades sobre una capa base digital (imagen escaneada, foto aérea digital, etc.) visualizada en la pantalla." },
+            { "unidad": "III-B", "pregunta": "¿Qué es el escaneo y qué dispositivo utiliza?", "respuesta": "Es el proceso de digitalización automática que convierte una imagen impresa en una imagen digital (capa ráster). Utiliza un escáner." },
+            { "unidad": "III-B", "pregunta": "¿Cuáles son los parámetros básicos de un escáner?", "respuesta": "Resolución espacial (puntos por pulgada - ppp) y resolución radiométrica (capacidad de distinguir colores)." },
+            { "unidad": "III-B", "pregunta": "¿Qué es la vectorización automática?", "respuesta": "Es un proceso que obtiene una capa vectorial a partir de cartografía impresa (o una imagen digital de esta) sin que el operario trace manualmente las entidades, mediante reconocimiento de patrones." },
+            { "unidad": "III-B", "pregunta": "¿Qué es la geocodificación y un ejemplo común?", "respuesta": "Es la asignación de coordenadas a puntos de interés a partir de información alfanumérica (sin un mapa gráfico previo). Ejemplo: asignar coordenadas a direcciones postales." },
+            { "unidad": "III-B", "pregunta": "¿Qué es la fotogrametría?", "respuesta": "Es la técnica para estudiar y definir con precisión la forma, dimensiones y posición de un objeto usando medidas sobre fotografías (aéreas en el contexto SIG)." },
+            { "unidad": "III-B", "pregunta": "¿Cuáles son los tipos de fotogrametría según su evolución?", "respuesta": "Analógica (imágenes analógicas), Analítica (formulaciones matemáticas y computación) y Digital (imágenes digitales en entorno computarizado)." },
+            { "unidad": "III-B", "pregunta": "¿Qué es un GNSS y cuál es el más conocido?", "respuesta": "GNSS (Sistemas Globales de Navegación por Satélite) permite conocer la localización exacta en cualquier punto del globo. El más conocido es el GPS (Sistema de Posicionamiento Global)." },
+            { "unidad": "III-B", "pregunta": "¿Cuáles son los tres segmentos del sistema GPS?", "respuesta": "1. Segmento espacial (satélites). 2. Segmento de control (estaciones terrestres). 3. Segmento de usuarios (receptores GPS)." },
+            { "unidad": "III-B", "pregunta": "¿En qué se basa el cálculo de posición del GPS y qué sistema de referencia usa?", "respuesta": "Se basa en la triangulación de la posición (x, y, z) mediante señales y distancias a varios satélites. Utiliza el sistema geodésico WGS84." },
+            { "unidad": "III-B", "pregunta": "Menciona algunas fuentes de error en el sistema GPS.", "respuesta": "Errores en posición de satélites, rebote de señal (multitrayectoria), paso por la atmósfera (ionosfera, troposfera), precisión de relojes, disponibilidad selectiva (eliminada en 2000)." },
+            { "unidad": "III-B", "pregunta": "Describe los tipos principales de receptores GPS según su uso.", "respuesta": "1. Uso general (bajo coste, portátiles, para ocio, navegación). 2. Medición topográfica (mayor precisión, antena externa, uso profesional SIG). 3. Medición del tiempo (fijos, alta precisión temporal)." },
+            { "unidad": "III-B", "pregunta": "¿Cómo se integra el GPS con los SIG?", "respuesta": "Como fuente de datos estática (crear capas a partir de datos de campo) o para obtención de datos en tiempo real (SIG móviles). Permite capturar componente espacial y, a menudo, temática (atributos)." },
+            { "unidad": "III-B", "pregunta": "¿Qué es la Información Geográfica Voluntaria (VGI) o Participativa?", "respuesta": "Es el uso de Internet para crear, gestionar y difundir información geográfica aportada voluntariamente por usuarios (neogeografía), democratizando la creación cartográfica." },
+            { "unidad": "III-B", "pregunta": "¿Cuáles son algunas críticas o problemas asociados a la VGI?", "respuesta": "La calidad de la información puede ser variable al provenir de no expertos y usar equipo de bajo coste, aunque para certos tipos de datos (ej. puntos de interés) puede ser suficiente." },
+            { "unidad": "III-B", "pregunta": "¿Por qué es importante la cartografía de elevaciones en SIG?", "respuesta": "Porque casi todos los procesos estudiados en SIG tienen relación con el relieve, y una capa de elevación aporta amplia información sobre ellos." },
+            { "unidad": "III-B", "pregunta": "Enumera las metodologías mencionadas para obtener cartografía de elevaciones.", "respuesta": "GPS, Digitalización de curvas de nivel, Estereografía, Interferometría (Radar, SRTM), LIDAR." },
+            { "unidad": "III-B", "pregunta": "¿Qué es un archivo 'World File' y para qué sirve?", "respuesta": "Es un pequeño archivo de texto plano que acompaña a un archivo de imagen y contiene los datos de georreferencia (tamaño de píxel, coordenadas de esquina, rotación) para que el SIG pueda ubicarla espacialmente. Su extensión se forma con la primera y última letra de la extensión de la imagen + 'w' (ej. .tfw para .tif)." },
+            { "unidad": "III-B", "pregunta": "Explica la diferencia entre compresión con pérdidas y sin pérdidas en imágenes.", "respuesta": "Sin pérdidas: Recupera la imagen exacta, sin degradación (ej. Run-Length). Con pérdidas: Pierde información para lograr mayor compresión, la imagen resultante es similar pero no idéntica (ej. JPEG, ECW)." },
+            { "unidad": "III-B", "pregunta": "¿Qué formato ráster común soporta una única banda y valor 'sin datos' en ASCII?", "respuesta": "ArcInfo ASCII (.asc)." },
+            { "unidad": "III-B", "pregunta": "Describe brevemente el formato TIFF/GeoTIFF.", "respuesta": "TIFF (.tif): Formato flexible, muchas variantes, puede usar compresión con/sin pérdidas, apto para imágenes y otros datos ráster (valores decimales). GeoTIFF: Variante que incluye georreferencia en el propio archivo." },
+            { "unidad": "III-B", "pregunta": "Describe brevemente los formatos ECW y MrSID.", "respuesta": "ECW (.ecw): Compresión con pérdidas, optimizado para imágenes grandes (aéreas/satélite), permite descompresión selectiva. MrSID (.sid): Similar a ECW (alta compresión, para imágenes grandes, descompresión selectiva) pero es un formato cerrado." },
+            { "unidad": "III-B", "pregunta": "¿Qué dos aspectos principales diferencian los formatos de archivo vectoriales?", "respuesta": "1. Capacidad para recoger la topología de la capa. 2. Capacidad para recoger los atributos temáticos de las entidades (limitada en formatos CAD)." },
+            { "unidad": "III-B", "pregunta": "Describe brevemente el formato Shapefile (.shp).", "respuesta": "Propuesto por ESRI, estándar de facto. No soporta topología directamente. Se compone de varios archivos (.shp, .shx, .dbf, etc.) que almacenan geometría, índices, atributos." },
+            { "unidad": "III-B", "pregunta": "Describe brevemente los formatos DWG y DXF.", "respuesta": "DWG: Formato nativo de AutoCAD (CAD), cerrado, almacena datos 2D/3D y metadatos. DXF: También de AutoCAD, especificaciones públicas, para interoperabilidad CAD, menos complejo que DWG, muy usado para cartografía." },
+            { "unidad": "III-B", "pregunta": "¿Cómo se manejaban los datos en los SIG de primera generación?", "respuesta": "Mediante archivos con formatos cerrados, vinculados al software específico, sin un SGBD estructurado. El propio SIG gestionaba el acceso y edición." },
+            { "unidad": "III-B", "pregunta": "Describe la arquitectura dual en los SIG de segunda generación.", "respuesta": "El SGBD relacional estándar gestionaba solo la componente temática. La componente espacial era gestionada por el propio SIG. Había dos subsistemas separados." },
+            { "unidad": "III-B", "pregunta": "Describe la arquitectura en capas en los SIG de segunda generación y sus dos alternativas.", "respuesta": "Toda la información (espacial y temática) se almacenaba en un SGBD relacional estándar. Alternativas: 1. Almacenamiento transparente (usa tipos de datos y SQL del SGBD). 2. Almacenamiento opaco (usa objetos binarios, operaciones implementadas en el SIG)." },
+            { "unidad": "III-B", "pregunta": "¿Cómo manejan los datos los SIG de tercera generación?", "respuesta": "Utilizan bases de datos con arquitecturas extensibles (orientadas a objetos o relacionales con extensiones espaciales como PostGIS, Oracle Spatial, etc.) que pueden definir y manejar tipos de datos espaciales y operaciones específicas de forma nativa y optimizada." },
+            { "unidad": "III-B", "pregunta": "Menciona SGBD Open Source con soporte espacial.", "respuesta": "PostgreSQL + PostGIS, SQLite + SpatiaLite, MySQL (con funciones espaciales)." },
+            { "unidad": "III-B", "pregunta": "Enumera las formas mencionadas para la captura de datos geográficos.", "respuesta": "Levantamientos fotogramétricos, imágenes de satélite, medidas GPS/Glonass/Galileo, Sensores, Levantamientos topográficos, Informes escritos/tablas/listas (con componente espacial)." },
+            // --- Unidad IV-A (Originales) ---
+            { "unidad": "IV-A", "pregunta": "¿Por qué se dice que los SIG son herramientas versátiles?", "respuesta": "Porque pueden adaptarse a circunstancias particulares de muchas disciplinas, utilizando prioritariamente distintas capacidades (análisis, visualización, manejo de datos) según las necesidades." },
+            { "unidad": "IV-A", "pregunta": "¿Qué porcentaje estimado de bases de datos administrativas son susceptibles de ser georreferenciadas?", "respuesta": "Más del 80%." },
+            { "unidad": "IV-A", "pregunta": "Menciona algunos factores para clasificar los ámbitos de aplicación de los SIG.", "respuesta": "Procesos de interés, tipo de datos, volumen de datos, precisión necesaria, tipo de usuarios, complejidad de operaciones, adecuación del SIG a las necesidades." },
+            { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta modelizadora.", "respuesta": "Permite modelizar realidades geográficas complexas combinando análisis sencillos en flujos de trabajo, adecuados para modelos conceptuales/matemáticos, estáticos/dinámicos." },
+            { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta para la toma de decisiones.", "respuesta": "Facilita combinar y visualizar globalmente múltiples variables (capas) para generar resultados que apoyen la interpretación de expertos y la toma de decisiones informadas." },
+            { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta para la difusión de información geográfica.", "respuesta": "Permite exponer datos geográficos de forma óptima a públicos amplios (incluyendo no técnicos vía web), añadiendo valor espacial a la información." },
+            { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta centralizadora.", "respuesta": "Actúa como sistema para gestionar y coordinar información geográfica y tareas de equipos en organizaciones (ej. SIG corporativo), donde la gestión de la base de datos es vital." },
+            { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en la Gestión de Recursos Naturales.", "respuesta": "Campo pionero en SIG. Herramienta excepcional para gestionar y explotar gran cantidad de datos variados (vector/ráster) sobre recursos naturales, con fuerte componente de análisis." },
+            { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en la Gestión de Riesgos.", "respuesta": "Análisis de distribución y probabilidad de riesgos (naturales/humanos). Uso principal de datos ráster (variables continuas) y vectoriales (registros de eventos). Usuarios avanzados." },
+            { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en Ecología.", "respuesta": "Gestión de datos de campo, creación de cartografía, modelización de comportamientos y distribuciones espaciales (migraciones, dispersión). Uso de visualización y análisis." },
+            { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en Negocios y Marketing.", "respuesta": "Análisis espacial para optimizar actividades de mercado: localización óptima, análisis de competencia, predicción de evolución, elaboración de informes y mapas comerciales." },
+            { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en Ciencias Sociales.", "respuesta": "Estudio de relaciones humanas y comunitarias vinculadas al espacio. Uso de análisis espacial y geoestadística para extraer conclusiones y elaborar hipótesis." },
+            { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en Planificación.", "respuesta": "Herramienta imprescindible para combinar múltiples factores y capas en la selección de emplazamientos óptimos, maximizando beneficios y minimizando impactos. Ayuda a la toma de decisiones." },
+            { "unidad": "IV-A", "pregunta": "Describe brevemente la aplicación de SIG en el Ámbito Militar.", "respuesta": "Herramienta valiosa desde sus inicios por la importancia de la información espacial. Uso intensivo del análisis para estudio de alternativas y escenarios, pero también edición y cartografía." },
+            { "unidad": "IV-A", "pregunta": "Menciona algunas áreas específicas de aplicación de SIG (más detalladas).", "respuesta": "Hidrografía, Jardinería, Agricultura (de precisión), Medio ambiente, Agraria, Geodesia/Topografía, Navegación/Transporte, Comunicación, Energía, Administración/Gestión (urbanística, servicios), Catastro, Planificación usos del suelo, Adm. Propiedades, Arqueología, Emergencias, Forestal, Turismo/Recreación, Seguimiento/Análisis, Salud, Educación, Seguridad." },
+            { "unidad": "IV-A", "pregunta": "¿Qué es la Semiología Gráfica?", "respuesta": "Ciencia que estudia los sistemas de signos visuales (gráficos) y su significado, definiendo una 'gramática' para comprender cómo transmiten información (según Jacques Bertin)." },
+            { "unidad": "IV-A", "pregunta": "Enumera las 7 variables visuales según Bertin.", "respuesta": "Posición, Tamaño, Forma, Textura, Tono (Color), Valor (Color), Orientación." },
+            { "unidad": "IV-A", "pregunta": "¿Por qué la variable visual 'Posición' tiene un uso restringido en cartografía?", "respuesta": "Porque en un mapa, la posición del símbolo ya está determinada por la ubicación geográfica real del objeto que representa, no se puede alterar libremente para transmitir otra información." },
+            { "unidad": "IV-A", "pregunta": "¿A qué tipo de símbolos se aplica fundamentalmente la variable 'Forma'?", "respuesta": "Principalmente a símbolos puntuales. Su aplicación a líneas es difícil y a superficies requiere alterar la forma del polígono (cartogramas) o usar un relleno con formas." },
+            { "unidad": "IV-A", "pregunta": "¿Cómo se aplica la variable 'Tamaño' a símbolos puntuales, lineales y de superficie?", "respuesta": "Puntuales: Variando el tamaño del símbolo. Lineales: Variando el grosor de la línea. Superficies: Alterando el tamaño del polígono (cartogramas) o variando el tamaño de la trama en la textura de relleno." },
+            { "unidad": "IV-A", "pregunta": "Define Tono, Valor y Saturación como componentes del color (espacio HSV).", "respuesta": "Tono (Hue): El color en sí (rojo, verde...). Valor (Value): Claridad/oscuridad del color. Saturación (Saturation): Pureza/intensidad del color (vs. grisáceo)." },
+            { "unidad": "IV-A", "pregunta": "¿Qué componentes del color se usan principalmente como variables visuales en cartografía?", "respuesta": "El Tono y el Valor. La Saturación tiene un uso muy limitado." },
+            { "unidad": "IV-A", "pregunta": "¿Cómo se aplica la variable 'Textura' a símbolos puntuales, lineales y de superficie?", "respuesta": "Puntuales: Relleno con un patrón (requiere tamaño suficiente). Lineales: Patrón de discontinuidad (guiones/espacios) o relleno si es gruesa (no recomendado). Superficies: Relleno con un patrón (uso más efectivo)." },
+            { "unidad": "IV-A", "pregunta": "¿Cómo se aplica la variable 'Orientación'?", "respuesta": "Principalmente a símbolos puntuales no simétricos (formas geométricas). Puede aplicarse a texturas en líneas (si son anchas) o superficies." },
+            { "unidad": "IV-A", "pregunta": "Define las 4 propiedades de las variables visuales: Asociativa, Selectiva, Ordenada, Cuantitativa.", "respuesta": "Asociativa: No altera la visibilidad/importancia. Selectiva: Permite agrupar en categorías. Ordenada: Permite representar un orden visual. Cuantitativa: Permite estimar cantidades/proporciones visualmente." },
+            { "unidad": "IV-A", "pregunta": "¿Qué variables visuales NO presentan la propiedad Asociativa (es decir, son disociativas)?", "respuesta": "El Tamaño y el Valor (un tamaño mayor o un valor más oscuro destacan más)." },
+            { "unidad": "IV-A", "pregunta": "¿Qué variable visual presenta más claramente la propiedad Selectiva?", "respuesta": "El Tono (color)." },
+            { "unidad": "IV-A", "pregunta": "¿Qué variables visuales presentan la propiedad Ordenada?", "respuesta": "Posición, Valor, Tamaño y Textura (si las tramas varían ordenadamente)." },
+            { "unidad": "IV-A", "pregunta": "¿Qué variables visuales presentan la propiedad Cuantitativa?", "respuesta": "Exclusivamente el Tamaño y la Posición." },
+            { "unidad": "IV-A", "pregunta": "¿Se puede usar el Tono para representar orden? Explica.", "respuesta": "Según Bertin, no tiene la propiedad ordenada. Sin embargo, en la práctica sí se puede si se usa una secuencia de tonos con una lógica culturalmente aceptada (ej. azul-frío a rojo-cálido para temperatura)." },
+            { "unidad": "IV-A", "pregunta": "¿Qué es un mapa?", "respuesta": "Una representación gráfica a escala, generalmente plana, de una parte de la superficie terrestre, mostrando la situación de objetos geográficos y considerando diversas condiciones (culturales, geofísicas, etc.)." },
+            { "unidad": "IV-A", "pregunta": "Diferencia entre mapa, carta y plano.", "respuesta": "Mapa: Representación general a escala. Carta: Mapa con ayudas específicas para la navegación. Plano: Representación a escala muy grande (mucho detalle) de un área pequeña, usando técnicas topográficas." },
+            { "unidad": "IV-A", "pregunta": "¿Qué es la Cartografía?", "respuesta": "El arte, ciencia y tecnología que intervienen en la elaboración de mapas y cartas." },
+            { "unidad": "IV-A", "pregunta": "¿Cuáles son las 4 etapas del proceso cartográfico?", "respuesta": "1. Recoger datos. 2. Manipular y generalizar datos (diseñar y construir mapa). 3. Visualizar el mapa. 4. Interpretar la información." },
+            { "unidad": "IV-A", "pregunta": "¿Qué es el diseño cartográfico?", "respuesta": "El conjunto de ideas y decisiones (simplificación, generalización, simbología) que toma el cartógrafo para crear un mapa efectivo." },
+            { "unidad": "IV-A", "pregunta": "¿Por qué es importante considerar el propósito y el usuario al crear un mapa?", "respuesta": "Porque un mapa técnicamente correcto puede ser inútil si no se adapta a quién lo va a usar y para qué, eligiendo elementos (escala, proyección, tipo de mapa, simbología) y nivel de complejidad adecuados." },
+            { "unidad": "IV-A", "pregunta": "Define Cartografía Base (o topográfica).", "respuesta": "Representa los principales elementos físicos de la superficie terrestre (vías, hidrografía, relieve, poblaciones) con precisión y localización. Objeto original de la cartografía." },
+            { "unidad": "IV-A", "pregunta": "Define Cartografía Temática.", "respuesta": "Se centra en representar un tema o variable espacial concreta (física, social, política, etc.), usando la cartografía base como referencia geográfica." },
+            { "unidad": "IV-A", "pregunta": "¿Cuáles son las dos partes diferenciadas de un mapa temático?", "respuesta": "1. Capa específica con la información temática. 2. Mapa base (con elementos de cartografía base simplificados) para dar localización geográfica." },
+            { "unidad": "IV-A", "pregunta": "Diferencia entre información cualitativa y cuantitativa en cartografía temática.", "respuesta": "Cualitativa: Tipos nominal y alfanumérico (categorías sin orden inherente). Cuantitativa: Tipos ordinal, intervalos y razones (valores numéricos con orden o magnitud)." },
+            { "unidad": "IV-A", "pregunta": "¿Qué variables visuales son adecuadas para información nominal/cualitativa?", "respuesta": "Forma (símbolos), Tono (colores distintos) o Textura. Se busca la propiedad selectiva." },
+            { "unidad": "IV-A", "pregunta": "¿Qué variables visuales son adecuadas para información ordinal/cuantitativa?", "respuesta": "Valor (gama de claridad/oscuridad) o Tamaño. Se busca la propiedad ordenada (y cuantitativa para razones/intervalos, donde el Tamaño es ideal)." },
+            { "unidad": "IV-A", "pregunta": "Enumera los elementos fundamentales que componen un mapa (layout).", "respuesta": "Título, Autor/Fuente, Canevás, Leyenda, Escala (numérica y gráfica), Norte, Localizador, (Opcional: Mapas de detalle, otra información)." },
+            { "unidad": "IV-A", "pregunta": "¿Qué consideraciones hay sobre la leyenda en un mapa?", "respuesta": "Debe ser clara y fácil de interpretar. Evitar precisión innecesaria en rangos numéricos. No separarla del mapa con un cuadro si no es necesario." },
+            { "unidad": "IV-A", "pregunta": "¿Qué elementos del mapa son menos necesarios en la visualización dinámica de un SIG?", "respuesta": "Autor, escala gráfica (hay herramientas de medida), canevás (mejor un localizador interactivo)." },
+            { "unidad": "IV-A", "pregunta": "¿Cuál es la premisa fundamental al disponer los elementos en el lienzo del mapa?", "respuesta": "Maximizar la claridad y aprovechar óptimamente el espacio disponible, evitando zonas en blanco." },
+            { "unidad": "IV-A", "pregunta": "¿Qué es el centro óptico de un mapa y dónde se sitúa?", "respuesta": "Es el punto focal visual del mapa, situado ligeramente por encima del centro geométrico (aprox. 5% de la altura)." },
+            { "unidad": "IV-A", "pregunta": "¿Qué zonas del mapa tienen mayor importancia visual?", "respuesta": "La parte superior y la parte izquierda." },
+            { "unidad": "IV-A", "pregunta": "¿Cuál es la dirección natural de la atención del lector en un mapa?", "respuesta": "Desde la esquina superior izquierda hasta la inferior derecha, pasando por el centro óptico." },
+            { "unidad": "IV-A", "pregunta": "¿Qué factores influyen en el 'peso visual' de un elemento en el mapa?", "respuesta": "Posición (más peso a la derecha, arriba, lejos del centro), Tamaño (mayor tamaño, más peso), Color (brillantes, rojo>azul), Aislamiento, Forma (regulares, compactas), Dirección (si apuntan a otros)." },
+            { "unidad": "IV-A", "pregunta": "Define mapa temático cuantitativo y cualitativo.", "respuesta": "Cuantitativo: Muestra información organizada o distribuciones numéricas. Cualitativo: Muestra información organizada en clases/categorías." },
+            // --- Unidad IV-B (Originales) ---
+            { "unidad": "IV-B", "pregunta": "¿Qué es el Catastro según el diccionario?", "respuesta": "Es el censo y padrón estadístico de los inmuebles/parcelas rústicas y urbanas, describiendo la propiedad inmobiliaria." },
+            { "unidad": "IV-B", "pregunta": "Menciona algunas funciones del catastro.", "respuesta": "Captura/mantenimiento/suministro de info. de inmuebles y titulares; renovar inventario; regir información adecuada; administrar info. de edificaciones; proveer herramienta de recursos financieros." },
+            { "unidad": "IV-B", "pregunta": "¿Cuáles son los dos enfoques del catastro como herramienta para la población?", "respuesta": "1. Permite a municipios obtener recursos para dar mejores servicios. 2. Proporciona seguridad sobre la propiedad privada." },
+            { "unidad": "IV-B", "pregunta": "Enumera algunos usos principales de la información catastral (SIC).", "respuesta": "Fiscal (impuestos), reducción de procesos administrativos, reordenamiento urbano, manejo de información gráfica/alfanumérica de parcelas, base para registro de propiedad, diseño de infraestructuras, calidad de materiales constructivos." },
+            { "unidad": "IV-B", "pregunta": "¿Cuál es la principal razón por la que la información catastral tiene poco uso más allá de ser cartografía base, a pesar de su disponibilidad?", "respuesta": "La dificultad técnica para explotar los datos, que requiere conocimientos sobre su estructura y qué información se puede extraer." },
+            { "unidad": "IV-B", "pregunta": "¿Por qué un gobierno municipal debería tener un Sistema de Información Catastral moderno (digital)?", "respuesta": "Para integrar y sistematizar toda la información catastral, fortaleciendo sus dependencias y permitiendo una mejor gestión y toma de decisiones." },
+            { "unidad": "IV-B", "pregunta": "¿Cómo ayudan los SIG al catastro?", "respuesta": "Permiten estructurar, visualizar y gestionar información espacialmente, asociando datos diversos al territorio, mejorando la planificación, la calidad del servicio y la eficiencia." },
+            { "unidad": "IV-B", "pregunta": "¿Qué componentes integran la plena identificación catastral?", "respuesta": "La suma de información cartográfica (SIG) e información alfanumérica descriptiva (suelo, construcciones)." },
+            { "unidad": "IV-B", "pregunta": "Menciona algunas explotaciones específicas de los datos catastrales usando SIG.", "respuesta": "Análisis físico (dimensiones, formas); análisis temporal (antigüedad edificios); análisis de usos del suelo (geomarketing); planeamiento urbanístico (alturas, edificabilidad, inventario suelo); demografía (estimación población por parcela)." },
+            { "unidad": "IV-B", "pregunta": "¿Qué permite la construcción de modelos 3D catastrales?", "respuesta": "Inventariar la información catastral de los inmuebles con detalle tridimensional, garantizando la plena identificación en ciudades complexas." },
+            { "unidad": "IV-B", "pregunta": "¿Cuál era la limitación de almacenar información catastral jurídica, económica y física solo en bases de datos alfanuméricas?", "respuesta": "La dificultad de relacionarla con el territorio donde se ubican los inmuebles." },
+            { "unidad": "IV-B", "pregunta": "¿Qué beneficios aporta la integración de bases de datos geográficas (BDG) y alfanuméricas (BDA) en un SIG Catastral?", "respuesta": "Garantiza integridad, consistencia y veracidad de la información; permite cálculo automatizado de áreas; posibilita ubicación espacial y relación entre inmuebles." },
+            { "unidad": "IV-B", "pregunta": "¿Por qué es fundamental registrar los cambios catastrales en el tiempo?", "respuesta": "Porque la dinámica inmobiliaria es constante y registrarla permite ver la evolución de los predios, analizarla en retrospectiva y tomar decisiones de planificación futuras." },
+            { "unidad": "IV-B", "pregunta": "Describe las características de un Sistema de Información Catastral (SIC) moderno.", "respuesta": "Mantiene datos físicos/jurídicos/económicos; base de datos al servicio de titulares y administraciones; gestión informatizada; actualización constante (declaraciones, revisiones, notarías); responsabilidad de Gerencias Territoriales; colaboración con Adm. Locales; incluye subsistema de gestión alfanumérico y subsistema geográfico (SIG); conectado a BD Nacional." },
+            { "unidad": "IV-B", "pregunta": "Define Escala Cartográfica.", "respuesta": "Es la relación entre las dimensiones de los objetos en el mapa y sus dimensiones reales en el terreno." },
+            { "unidad": "IV-B", "pregunta": "¿Cómo se expresa matemáticamente la escala?", "respuesta": "1/E = Dm/Dt (donde E=Escala, Dm=Distancia mapa, Dt=Distancia terreno)." },
+            { "unidad": "IV-B", "pregunta": "¿Qué es la Unidad Mínima Cartografiable (UMC)?", "respuesta": "El tamaño mínimo real que debe tener un objeto para poder ser representado en un mapa a una escala dada (o según el uso previsto)." },
+            { "unidad": "IV-B", "pregunta": "¿Cuáles son las tres formas de expresar la escala en un mapa?", "respuesta": "Textual (ej. 'un cm representa 600 km'), Numérica (ej. 1:10,000), Gráfica (barra dividida)." },
+            { "unidad": "IV-B", "pregunta": "¿Por qué es importante incluir siempre la escala gráfica en un mapa impreso?", "respuesta": "Porque si el mapa sufre cambios de tamaño (ampliación/reducción), la escala gráfica mantiene la proporción correcta, mientras que la numérica quedaría incorrecta." },
+            { "unidad": "IV-B", "pregunta": "Explica qué significa una escala 1:20,000.", "respuesta": "Significa que 1 unidad de medida en el mapa representa 20,000 de esas mismas unidades en el terreno (ej. 1 cm en mapa = 20,000 cm en terreno)." },
+            { "unidad": "IV-B", "pregunta": "En cartografía, ¿una escala 1:25,000 es mayor o menor que 1:50,000?", "respuesta": "1:25,000 es una escala MAYOR (muestra más detalle, menos área) que 1:50,000 (escala MENOR, muestra menos detalle, más área)." },
+            { "unidad": "IV-B", "pregunta": "¿Qué es la generalización cartográfica y cuándo se aplica?", "respuesta": "Es la simplificación de la información al pasar a una escala menor (ej. de 1:25,000 a 1:50,000), eliminando o simplificando detalles según la nueva UMC." },
+            { "unidad": "IV-B", "pregunta": "¿Qué ocurre si se amplía un mapa a una escala mayor que la original en un SIG?", "respuesta": "La precisión no aumenta, la visualización puede verse extraña (poca densidad de entidades, se ven vértices) porque no se añade nueva información." },
+            { "unidad": "IV-B", "pregunta": "Define Escala de Análisis.", "respuesta": "Es el nivel o extensión espacial que se considera al estudiar un fenómeno geográfico. Afecta a la percepción de estructuras espaciales y a los resultados del análisis." },
+            { "unidad": "IV-B", "pregunta": "¿Por qué la longitud medida de una costa o un camino puede variar según la 'vara de medir' (escala de análisis)?", "respuesta": "Porque una unidad de medida más pequeña captura más detalles (sinuosidades) de la línea, resultando en una longitud total mayor. La medida absoluta carece de sentido sin especificar la escala." },
+            { "unidad": "IV-B", "pregunta": "¿Cómo afecta la resolución espacial (tamaño de celda) de un dato ráster a la escala de análisis?", "respuesta": "La resolución espacial condiciona la escala mínima de análisis. Detalles o variaciones más pequeños que el tamaño de celda no pueden ser capturados ni analizados." },
+            { "unidad": "IV-B", "pregunta": "Define Precisión en el contexto de imágenes geográficas.", "respuesta": "Es la certeza con la que un objeto está ubicado en el terreno donde aparece en la imagen. Se expresa a menudo en píxeles (convertibles a metros según la resolución)." },
+            { "unidad": "IV-B", "pregunta": "¿Qué relación existe entre resolución de imagen y escala topográfica típica?", "respuesta": "A mayor resolución (píxel más pequeño en metros), corresponde una escala topográfica mayor (más detalle). Ej: 1m res -> 1:2,000; 30m res -> 1:80,000." },
+            { "unidad": "IV-B", "pregunta": "Menciona estrategias para controlar errores y mantener la precisión en un proyecto SIG.", "respuesta": "1. Usar datos de partida precisos y con calidad documentada (metadatos). 2. Minimizar la propagación de errores estructurando adecuadamente los procesos (operaciones más propensas al error al final)." },
+            { "unidad": "IV-B", "pregunta": "Enumera ideas para evitar errores y pérdida de precisión en SIG.", "respuesta": "Evitar mezclar capas de orígenes/formatos dispares sin control; ser consciente de que precisión disminuye con resolución; la precisión final no supera la del dato menos preciso; menos capas en análisis = menos oportunidad de error." },
+            { "unidad": "IV-B", "pregunta": "¿Por qué son importantes los metadatos en relación a la precisión?", "respuesta": "Porque documentan la calidad, origen y precisión de los datos SIG, información que a menudo se ignora pero es crucial para evaluar la fiabilidad de los resultados." },
+            { "unidad": "IV-B", "pregunta": "¿Qué son las Proyecciones Cartográficas?", "respuesta": "Son transformaciones matemáticas para representar la superficie curva de la Tierra en un plano (mapa), introduciendo inevitablemente distorsiones (área, forma, distancia, ángulo)." },
+            { "unidad": "IV-B", "pregunta": "¿Qué aspectos considerar al elegir una proyección?", "respuesta": "Tamaño del área (global vs local), localización (ecuador, polos, lat. medias), forma del área, propósito del mapa (conservar áreas, formas, distancias, etc.)." },
+            { "unidad": "IV-B", "pregunta": "Diferencia entre Conversión y Transformación de coordenadas.", "respuesta": "Conversión: Entre sistemas con el mismo datum (exacta). Transformación: Entre sistemas con diferente datum (más compleja, puede no ser exacta)." },
+            { "unidad": "IV-B", "pregunta": "¿Cómo manejan los SIG los diferentes sistemas de coordenadas?", "respuesta": "Incorporan funciones para cambiar coordenadas (conversión/transformación) o realizan transformaciones 'al vuelo' (en tiempo real) si los datos tienen definida su proyección original." },
 
+             // --- Unidad: Parciales Anteriores (Preguntas Válidas del PDF Completo) ---
+            { "unidad": "Parciales Anteriores", "pregunta": "La principal ventaja de una BD orientada a objetos es su mayor eficiencia en el acceso a datos en comparación con una BD relacional y por la base matemática de ésta, por lo que el soporte para esas consultas es robusto.", "respuesta": "Falso" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Esta es una característica de la imagen que, con frecuencia, se pasa por alto y puede ser critica para las aplicaciones cartográficas. Se refiere a la certeza con la que un objeto dado se encontrará sobre el terreno donde aparece en la imagen.", "respuesta": "Precisión" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Es una representación de la superficie de la tierra elaborada a escalas muy grandes, es decir, con mucho detalle y mediante técnicas proporcionadas por la topografía.", "respuesta": "Plano" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Area de aplicación de los GIS para estudios epidemiológicos, análisis oferta y demanda de centros sanitarios, determinación de pobladores beneficiados, determinación de rutas de emergencia, etc.", "respuesta": "Salud" },
+            { "unidad": "Parciales Anteriores", "pregunta": "En el Catastro, la integración de una base de datos alfanumérica y una geográfica dan vida a lo que se conoce como:", "respuesta": "SIC: Sistema de informacion catrastico" }, // Respuesta de la sección inicial
+            { "unidad": "Parciales Anteriores", "pregunta": "Analice el siguiente texto: \"Si en una capa con información catastral cambia la frontera de una parcela, basta que modifiquemos esta frontera para mantener la distibución completa del espacio real. En un mapa analógico habrá que rehacer todo el mapa y volver a imprimirse\". ¿Cual de las ventajas de los datos geográficos digitales frente a los analógicos, es la que aplicaría en este caso?", "respuesta": "Sencillez de actualización" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Es uno de los orígenes de datos remotos con los que QGIS tiene capacidad de trabajar", "respuesta": "WFS" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Nombre de la herramienta de QGIS que permite ver y manipular la data de un mapa, tanto espacial como temática:", "respuesta": "Tabla de atributos" },
+            { "unidad": "Parciales Anteriores", "pregunta": "En una vista con 4 capas, la capa 2 tiene un tamaño muy grande, ¿qué operación de un solo paso realizaría en gvSIG para verlas bien?", "respuesta": "Zoom a la capa" }, // Respuesta más consistente/lógica
+            { "unidad": "Parciales Anteriores", "pregunta": "Formato de archivo al que gvSIG es capaz de acceder y trabajar:", "respuesta": "Web map service" }, // WMS/Web map service
+            { "unidad": "Parciales Anteriores", "pregunta": "Aplicar un GIS donde tenemos una tendencia observada y una tendencia esperada se conoce como", "respuesta": "Seguimiento" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Dos Escuelas se encuentran físicamente a una distancia de 5.5 Km. En un mapa cuya escala es de 1:5000, ¿Cuántos centímetros mide la distancia entre las Escuelas mencionadas?", "respuesta": "110" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Es el estudio y medida de las características de una serie de objetos sin que exista contacto físico.", "respuesta": "Teledetección" },
+            { "unidad": "Parciales Anteriores", "pregunta": "\"Captura, Mantenimiento, y suministro de información sobre los bienes inmuebles rústicos, urbanos y de características especiales sobre sus titulares\", es una función concerniente a:", "respuesta": "Catastro" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Si una imagen tiene una resolución de 5 metros con una precisión de un píxel, ¿cuántos metros estarán descolocados los objetos de dicha imagen y en qué dirección?", "respuesta": "5 metros, en cualquier dirección" },
+            { "unidad": "Parciales Anteriores", "pregunta": "\"Definir incorrectamente los propósitos del mapa\", es un error cartográfico imputable a:", "respuesta": "Diseño cartográfico" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Analice el siguiente texto y seleccione el literal que mejor corresponda con esto: \"Involucra un conjunto de actividades cartográficas que tienden a mostrar las características concretas de una determinada distribución geográfica, donde lo que se muestra son las clases en las que se puede descomponer un fenómeno cualquiera\"", "respuesta": "Cartografia temática Cualitativa" },
+            // Pregunta 18 EXCLUIDA
+            { "unidad": "Parciales Anteriores", "pregunta": "Una Laguna artificial está representada en un mapa mediante 25 centímetros cuadrados y el mapa posee una escala de 1:1500. ¿Cuál es la superficie real de la Laguna, expresada en metros cuadrados?", "respuesta": "5625" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Arquitectura en la que el SGBD se hace cargo únicamente de la componente temática de los datos.", "respuesta": "Arquitectura dual" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Es el método de captura de datos geográficos con cuya técnica se estudia las dimensiones y posición de elementos espaciales a través del uso de fotografías", "respuesta": "Levantamientos fotogramétricos" },
+            { "unidad": "Parciales Anteriores", "pregunta": "La imagen satelital de El Salvador tiene una resolución de 3 metros con una precisión de dos píxeles, ¿cuántos metros estarán descolocados los objetos de dicha imagen y en qué dirección?", "respuesta": "6 metros, en cualquier dirección" },
+            { "unidad": "Parciales Anteriores", "pregunta": "La cartografia como \"método de trabajo\" implica una manipulación y generalización de los datos.", "respuesta": "Verdadero" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Analice el siguiente planteamiento y seleccione la respuesta que mejor le corresponda: \"Con esta variable visual se tiene la necesidad de una ampliación/disminución de un elemento, de manera que sea provechosa la trama o patrón aplicada al relleno de ese elemento\"", "respuesta": "Textura" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Un mapa Cartográfico es aquel que representa gráficamente los principales elementos que conforman la superficie de la Tierra, tales como las vías de comunicación, entidades de población, la hidrografía y el relieve, definiendo una precisión adecuada a la escala y estableciendo unas características de localización que permiten articular la cartografía de considerables extensiones de terreno.", "respuesta": "Falso" }, // Basado en corrección explícita
+            { "unidad": "Parciales Anteriores", "pregunta": "Encuentre la Escala de un mapa donde se presenta el polígono correspondiente a un Centro Comercial con una medida de 25 centímetros cuadrados, mismo que tiene una superficie real de 2500 metros cuadrados.", "respuesta": "1000" },
+            { "unidad": "Parciales Anteriores", "pregunta": "La semiología es la ciencia que estudia los sistemas y signos del latin para referirse a otra cosa.", "respuesta": "Falso" }, // Basado en corrección explícita
+            { "unidad": "Parciales Anteriores", "pregunta": "La cartografia como \"sistema de comunicación\" se aplica a multiples disciplinas", "respuesta": "Verdadero" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Los datos secundarios (o procedentes de una fuente secundaria) son los que derivan de algún otro tipo de dato previo, el cual está preparado y es adecuado para su empleo en un SIG.", "respuesta": "Falso" }, // Basado en corrección explícita
+            { "unidad": "Parciales Anteriores", "pregunta": "Cuando la variable que se cartografía no está expresando valor alguno se dice que se trata de un mapa cualitativo", "respuesta": "Verdadero" },
+            { "unidad": "Parciales Anteriores", "pregunta": "La utilización de GPS permite obtener una nube de puntos de elevación y no solo de la posición que ocupa en coordenadas x y.", "respuesta": "Verdadero" },
+            { "unidad": "Parciales Anteriores", "pregunta": "Elemento que tienen en común las interfaces de gvSIG y de QGIS donde se organiza el contenido de las vistas:", "respuesta": "TOC (Table Of Contents)" },
+            { "unidad": "Parciales Anteriores", "pregunta": "En el almacenamiento transparente a diferencia del almacenamiento opaco, se emplean los propios tipos de datos del SGBD, y las operaciones se implementan en el lenguaje de consulta de este.", "respuesta": "Verdadero" }
+             // Pregunta 34 EXCLUIDA (sin respuesta clara)
         ];
 
         // --- Estado Global de la Aplicación ---
         let cards = [];
         let currentCardIndex = -1;
         let studyPile = [];
-        let isFlipped = false; // Indica si la tarjeta única está mostrando la respuesta
+        let isFlipped = false;
         let currentView = 'study';
+        let selectedUnitFilter = 'all';
 
         // --- Referencias a Elementos del DOM ---
-        const sidebar = document.getElementById('sidebar');
-        const openSidebarBtn = document.getElementById('open-sidebar-btn');
-        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-        const mainContent = document.getElementById('main-content');
+        // ... (Idénticas a la versión anterior) ...
+         const sidebar = document.getElementById('sidebar');
+         const openSidebarBtn = document.getElementById('open-sidebar-btn');
+         const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+         const sidebarOverlay = document.getElementById('sidebar-overlay');
+         const mainContent = document.getElementById('main-content');
+         const unitFilterSelect = document.getElementById('unit-filter');
+         const cardContainer = document.getElementById('flashcard-container');
+         const cardContent = document.getElementById('flashcard-content');
+         const cardText = document.getElementById('card-text');
+         const progressCounter = document.getElementById('progress-counter');
+         const studyCompleteMessage = document.getElementById('study-complete-message');
+         const studyFilteredCompleteMessage = document.getElementById('study-filtered-complete-message');
+         const loadingErrorMessage = document.getElementById('loading-error-message');
+         const noCardsForFilterMessage = document.getElementById('no-cards-for-filter-message');
+         const btnNotLearned = document.getElementById('btn-not-learned');
+         const btnAlmost = document.getElementById('btn-almost');
+         const btnLearned = document.getElementById('btn-learned');
+         const btnResetProgress = document.getElementById('btn-reset-progress');
+         const btnViewStudy = document.getElementById('btn-view-study');
+         const btnViewPiles = document.getElementById('btn-view-piles');
+         const btnViewAll = document.getElementById('btn-view-all');
+         const viewStudy = document.getElementById('view-study');
+         const viewPiles = document.getElementById('view-piles');
+         const viewAll = document.getElementById('view-all');
+         const pileToLearnCount = document.getElementById('pile-to-learn-count');
+         const pileAlmostCount = document.getElementById('pile-almost-count');
+         const pileLearnedCount = document.getElementById('pile-learned-count');
+         const allCardsTableBody = document.getElementById('all-cards-table-body');
 
-        // Referencias para la tarjeta única
-        const cardContainer = document.getElementById('flashcard-container');
-        const cardContent = document.getElementById('flashcard-content'); // El div que cambia de color
-        const cardText = document.getElementById('card-text'); // El párrafo dentro del div
-
-        const progressCounter = document.getElementById('progress-counter');
-        const studyCompleteMessage = document.getElementById('study-complete-message');
-        const loadingErrorMessage = document.getElementById('loading-error-message');
-
-        const btnNotLearned = document.getElementById('btn-not-learned');
-        const btnAlmost = document.getElementById('btn-almost');
-        const btnLearned = document.getElementById('btn-learned');
-        const btnResetProgress = document.getElementById('btn-reset-progress');
-
-        const btnViewStudy = document.getElementById('btn-view-study');
-        const btnViewPiles = document.getElementById('btn-view-piles');
-        const btnViewAll = document.getElementById('btn-view-all');
-
-        const viewStudy = document.getElementById('view-study');
-        const viewPiles = document.getElementById('view-piles');
-        const viewAll = document.getElementById('view-all');
-
-        const pileToLearnCount = document.getElementById('pile-to-learn-count');
-        const pileAlmostCount = document.getElementById('pile-almost-count');
-        const pileLearnedCount = document.getElementById('pile-learned-count');
-        const allCardsTableBody = document.getElementById('all-cards-table-body');
 
         // --- Funciones Principales ---
+        // ... (Todas las funciones JS son idénticas a la versión anterior) ...
+        // shuffleArray, saveState, loadState, initializeCards, buildStudyPile,
+        // displayCurrentCard, flipCard, updateCardStatus, moveToNextCard,
+        // updatePilesView, updateAllCardsView, switchView, updateAllViews,
+        // resetProgress, getUniqueUnits, populateUnitFilter, applyUnitFilter,
+        // openSidebar, closeSidebar
 
-        function shuffleArray(array) { /* ... (sin cambios) ... */
+         function shuffleArray(array) {
              for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-        function saveState() { /* ... (sin cambios) ... */
+                 const j = Math.floor(Math.random() * (i + 1));
+                 [array[i], array[j]] = [array[j], array[i]];
+             }
+         }
+         function saveState() {
              try {
-                const cardStates = cards.map(card => ({ id: card.id, status: card.status }));
-                localStorage.setItem('flashcardsAppState', JSON.stringify(cardStates));
-            } catch (e) {
-                console.error("Error saving state to localStorage:", e);
-            }
-        }
-        function loadState() { /* ... (sin cambios) ... */
+                 const cardStates = cards.map(card => ({ id: card.id, status: card.status }));
+                 localStorage.setItem('flashcardsAppState', JSON.stringify(cardStates));
+                  localStorage.setItem('flashcardsAppFilter', selectedUnitFilter); // Guardar filtro
+             } catch (e) {
+                 console.error("Error saving state to localStorage:", e);
+             }
+         }
+          function loadState() {
              const savedStates = localStorage.getItem('flashcardsAppState');
-            let states = {};
-            let errorLoadingState = false;
+              const savedFilter = localStorage.getItem('flashcardsAppFilter'); // Cargar filtro
+             let states = {};
+             let errorLoadingState = false;
 
-            if (savedStates) {
-                try {
-                    JSON.parse(savedStates).forEach(state => { states[state.id] = state.status; });
-                    console.log("Loaded states from localStorage.");
-                } catch (e) {
-                    console.error("Error parsing saved state:", e);
-                    errorLoadingState = true; // Marcar error para inicializar
-                }
-            } else {
-                errorLoadingState = true; // No hay estado guardado, inicializar
-            }
+             if (savedStates) {
+                 try {
+                     JSON.parse(savedStates).forEach(state => { states[state.id] = state.status; });
+                     console.log("Loaded states from localStorage.");
+                 } catch (e) { console.error("Error parsing saved state:", e); errorLoadingState = true; }
+             } else { errorLoadingState = true; }
 
-            cards = flashcardsData.map((cardData, index) => ({
-                ...cardData,
-                id: index,
-                status: !errorLoadingState && states[index] ? states[index] : 'to_learn'
-            }));
+              // Asignar ID único a cada tarjeta en flashcardsData
+              flashcardsData.forEach((card, index) => card.originalIndex = index);
 
-            if (errorLoadingState) {
-                console.log("Initializing card states to 'to_learn'.");
-                saveState();
-            }
+             cards = flashcardsData.map((cardData, index) => ({
+                 ...cardData,
+                 id: index, // Usar índice como ID para estados
+                 status: !errorLoadingState && states[index] ? states[index] : 'to_learn'
+             }));
 
-            buildStudyPile();
-            updateAllViews();
-        }
-        function initializeCards() { /* ... (sin cambios) ... */
-             cards.forEach(card => card.status = 'to_learn');
-            saveState();
-            console.log("Card states initialized to 'to_learn'.");
-        }
-        function buildStudyPile() { /* ... (sin cambios) ... */
-             studyPile = cards
-                .filter(card => card.status === 'to_learn' || card.status === 'almost')
-                .map(card => card.id);
-            shuffleArray(studyPile);
-            currentCardIndex = studyPile.length > 0 ? 0 : -1;
-            console.log(`Study pile built/rebuilt with ${studyPile.length} cards.`);
-        }
+             if (errorLoadingState) { console.log("Initializing card states to 'to_learn'."); /* No guardamos aquí todavía */ }
 
-        /**
-         * Muestra la tarjeta actual (pregunta) en la interfaz o el mensaje de completado.
-         */
-        function displayCurrentCard() {
-            isFlipped = false; // Siempre mostrar la pregunta primero
+              // Restaurar filtro o usar 'all'
+              selectedUnitFilter = savedFilter || 'all';
 
-            if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
-                const cardId = studyPile[currentCardIndex];
-                const card = cards.find(c => c.id === cardId);
+             // Poblar el selector de unidades AHORA que 'cards' está cargado
+              populateUnitFilter();
+              // Asegurarse que el valor del select coincida con el filtro cargado/por defecto
+              unitFilterSelect.value = selectedUnitFilter;
 
-                if (card) {
-                    // Configurar tarjeta para mostrar la PREGUNTA
-                    cardText.textContent = card.pregunta;
-                    cardContent.classList.remove('card-answer-style'); // Quitar estilo respuesta
-                    cardContent.classList.add('card-question-style'); // Poner estilo pregunta
+              // Si hubo error cargando estados, AHORA inicializamos y guardamos
+              if (errorLoadingState) {
+                  initializeCards(); // Esto llama a saveState()
+              }
 
-                    progressCounter.textContent = `Tarjeta ${currentCardIndex + 1} de ${studyPile.length}`;
-                    studyCompleteMessage.classList.add('view-hidden');
-                    loadingErrorMessage.classList.add('view-hidden');
 
-                    btnNotLearned.disabled = false;
-                    btnAlmost.disabled = false;
-                    btnLearned.disabled = false;
-                    cardContainer.style.cursor = 'pointer';
-                } else {
-                    console.error(`Card with ID ${cardId} from studyPile not found.`);
-                    loadingErrorMessage.textContent = `Error: Tarjeta ${cardId} no encontrada. Saltando...`;
-                    loadingErrorMessage.classList.remove('view-hidden');
-                    studyPile.splice(currentCardIndex, 1);
-                    if (currentCardIndex >= studyPile.length) {
-                         currentCardIndex = studyPile.length > 0 ? 0 : -1;
-                    }
-                    displayCurrentCard(); // Intentar mostrar la siguiente
-                }
-            } else {
-                // Pila de estudio vacía
-                cardText.textContent = ''; // Limpiar texto
-                // Quitar estilos específicos por si acaso
-                cardContent.classList.remove('card-question-style', 'card-answer-style');
+             buildStudyPile(); // Construir pila inicial (ya considera el selectedUnitFilter)
+             updateAllViews(); // Actualizar vistas
+         }
 
-                if (cards.length > 0) {
-                     progressCounter.textContent = '¡Pila de estudio completada!';
-                    studyCompleteMessage.classList.remove('view-hidden');
-                } else {
-                    progressCounter.textContent = 'No hay tarjetas cargadas.';
-                    studyCompleteMessage.classList.add('view-hidden');
-                }
-                loadingErrorMessage.classList.add('view-hidden');
+         function initializeCards() {
+              cards.forEach(card => card.status = 'to_learn');
+             saveState(); // Guarda estados reiniciados Y el filtro actual
+             console.log("Card states initialized to 'to_learn'.");
+         }
 
-                btnNotLearned.disabled = true;
-                btnAlmost.disabled = true;
-                btnLearned.disabled = true;
-                cardContainer.style.cursor = 'default';
-            }
-        }
+         function buildStudyPile() {
+             let filteredCards = cards;
+             if (selectedUnitFilter !== 'all') {
+                 filteredCards = cards.filter(card => card.unidad === selectedUnitFilter);
+             }
+             studyPile = filteredCards
+                 .filter(card => card.status === 'to_learn' || card.status === 'almost')
+                 .map(card => card.id);
+             shuffleArray(studyPile);
+             currentCardIndex = studyPile.length > 0 ? 0 : -1;
+             console.log(`Study pile built for unit "${selectedUnitFilter}" with ${studyPile.length} cards.`);
+         }
 
-        /**
-         * Alterna entre mostrar la pregunta y la respuesta en la tarjeta única.
-         */
-        function flipCard() {
-            if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
-                const cardId = studyPile[currentCardIndex];
-                const card = cards.find(c => c.id === cardId);
+         function displayCurrentCard() {
+             isFlipped = false;
+             studyCompleteMessage.classList.add('view-hidden');
+              studyFilteredCompleteMessage.classList.add('view-hidden');
+              loadingErrorMessage.classList.add('view-hidden');
+              noCardsForFilterMessage.classList.add('view-hidden');
 
-                if (!card) return; // Salir si no se encuentra la tarjeta actual
-
-                isFlipped = !isFlipped; // Cambiar el estado
-
-                if (isFlipped) {
-                    // Mostrar RESPUESTA (verde)
-                    cardText.textContent = card.respuesta;
-                    cardContent.classList.remove('card-question-style');
-                    cardContent.classList.add('card-answer-style');
-                } else {
-                    // Mostrar PREGUNTA (azul)
-                    cardText.textContent = card.pregunta;
-                    cardContent.classList.remove('card-answer-style');
-                    cardContent.classList.add('card-question-style');
-                }
-            }
-        }
-
-        function updateCardStatus(newStatus) { /* ... (lógica sin cambios) ... */
              if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
-                const cardId = studyPile[currentCardIndex];
-                const cardArrayIndex = cards.findIndex(c => c.id === cardId);
-
-                if (cardArrayIndex !== -1) {
-                    cards[cardArrayIndex].status = newStatus;
-                    saveState(); // Guardar el nuevo estado
-
-                    let nextIndex = currentCardIndex;
-
-                    if (newStatus === 'learned') {
-                        studyPile.splice(currentCardIndex, 1);
-                        if (nextIndex >= studyPile.length) {
-                            nextIndex = studyPile.length > 0 ? 0 : -1;
-                        }
-                    } else {
-                        nextIndex++;
-                        if (nextIndex >= studyPile.length) {
-                             console.log("End of current study pile iteration reached. Rebuilding and shuffling.");
-                             buildStudyPile();
-                             nextIndex = currentCardIndex;
-                        }
-                    }
-                    currentCardIndex = nextIndex;
-                    updateAllViews(); // Actualiza UI, incluyendo displayCurrentCard
-
-                } else {
-                    console.error(`Could not find card with ID ${cardId} in main cards array during status update.`);
-                     moveToNextCard();
-                }
-            }
-        }
-        function moveToNextCard() { /* ... (sin cambios) ... */
-             if (currentCardIndex !== -1) {
-                 currentCardIndex++;
-                 if (currentCardIndex >= studyPile.length) {
-                     buildStudyPile();
+                 const cardId = studyPile[currentCardIndex];
+                 const card = cards.find(c => c.id === cardId);
+                 if (card) {
+                     cardText.textContent = card.pregunta;
+                     cardContent.classList.remove('card-answer-style');
+                     cardContent.classList.add('card-question-style');
+                     progressCounter.textContent = `Tarjeta ${currentCardIndex + 1} de ${studyPile.length} (Unidad: ${selectedUnitFilter === 'all' ? 'Todas' : selectedUnitFilter})`;
+                     btnNotLearned.disabled = false;
+                     btnAlmost.disabled = false;
+                     btnLearned.disabled = false;
+                     cardContainer.style.cursor = 'pointer';
+                 } else {
+                     console.error(`Error: Card ID ${cardId} in studyPile not found.`);
+                     loadingErrorMessage.textContent = `Error interno al cargar tarjeta ${cardId}.`;
+                      loadingErrorMessage.classList.remove('view-hidden');
+                      moveToNextCard();
                  }
-                 displayCurrentCard();
-            }
-        }
-        function updatePilesView() { /* ... (sin cambios) ... */
+             } else {
+                 cardText.textContent = '';
+                 cardContent.classList.remove('card-question-style', 'card-answer-style');
+                  progressCounter.textContent = `Unidad: ${selectedUnitFilter === 'all' ? 'Todas' : selectedUnitFilter}`;
+
+                  const totalCardsInFilter = (selectedUnitFilter === 'all')
+                      ? cards.length
+                      : cards.filter(c => c.unidad === selectedUnitFilter).length;
+                  const pendingCardsInFilter = studyPile.length; // studyPile ya está filtrado por unidad Y estado
+
+                  if (totalCardsInFilter === 0 && selectedUnitFilter !== 'all') {
+                       noCardsForFilterMessage.textContent = `No existen tarjetas para la unidad "${selectedUnitFilter}".`;
+                       noCardsForFilterMessage.classList.remove('view-hidden');
+                  } else if (pendingCardsInFilter === 0) { // Si la pila de estudio para el filtro está vacía
+                       if (selectedUnitFilter === 'all') {
+                            studyCompleteMessage.classList.remove('view-hidden');
+                       } else {
+                            studyFilteredCompleteMessage.classList.remove('view-hidden');
+                       }
+                  } else { // Caso raro: índice -1 pero pila no vacía (debería corregirse en moveToNext) o error
+                        noCardsForFilterMessage.textContent = `No hay tarjetas por estudiar para esta unidad en este momento.`;
+                        noCardsForFilterMessage.classList.remove('view-hidden');
+                  }
+
+                 btnNotLearned.disabled = true;
+                 btnAlmost.disabled = true;
+                 btnLearned.disabled = true;
+                 cardContainer.style.cursor = 'default';
+             }
+         }
+
+         function flipCard() {
+             if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
+                 const cardId = studyPile[currentCardIndex];
+                 const card = cards.find(c => c.id === cardId);
+                 if (!card) return;
+                 isFlipped = !isFlipped;
+                 if (isFlipped) {
+                     cardText.textContent = card.respuesta;
+                     cardContent.classList.remove('card-question-style');
+                     cardContent.classList.add('card-answer-style');
+                 } else {
+                     cardText.textContent = card.pregunta;
+                     cardContent.classList.remove('card-answer-style');
+                     cardContent.classList.add('card-question-style');
+                 }
+             }
+         }
+
+          function updateCardStatus(newStatus) {
+             if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
+                 const cardId = studyPile[currentCardIndex];
+                 const cardArrayIndex = cards.findIndex(c => c.id === cardId);
+
+                 if (cardArrayIndex !== -1) {
+                     cards[cardArrayIndex].status = newStatus;
+                     saveState(); // Guardar estado actualizado Y filtro actual
+
+                     let studyPileBeforeUpdate = [...studyPile]; // Copia para referencia
+                     let currentIndexBeforeUpdate = currentCardIndex;
+
+                     // Lógica de avance DENTRO de la pila actual (ya filtrada)
+                     if (newStatus === 'learned') {
+                         // Quitar de la pila actual
+                         studyPile.splice(currentCardIndex, 1);
+
+                         // Decidir dónde poner el índice: si quedan tarjetas en la pila actual,
+                         // el índice actual ahora apunta a la siguiente (o se vuelve inválido si era la última).
+                         // Si no quedan tarjetas, currentCardIndex se volverá -1.
+                         if (currentIndexBeforeUpdate >= studyPile.length) {
+                              // Era la última de la pila actual.
+                              currentCardIndex = studyPile.length > 0 ? 0 : -1; // Empezar de nuevo si quedan, o marcar vacía
+                         }
+                          // Si no era la última, el índice efectivo no cambia, pero la tarjeta en ese índice sí.
+
+                     } else {
+                         // Si 'to_learn' o 'almost', simplemente avanzar al siguiente índice.
+                         currentCardIndex++;
+                         if (currentCardIndex >= studyPile.length) {
+                              // Llegamos al final de la vuelta actual de la pila filtrada.
+                              // Reconstruimos y barajamos DE NUEVO solo las que quedan para este filtro.
+                              console.log(`End of study pile iteration for unit "${selectedUnitFilter}". Rebuilding and shuffling.`);
+                              buildStudyPile(); // Esto recalcula la pila y resetea currentCardIndex a 0 si aplica
+                         }
+                     }
+                     // Actualizar la vista para mostrar la siguiente tarjeta o mensaje de completado
+                      displayCurrentCard(); // displayCurrentCard maneja el índice -1
+
+                 } else {
+                     console.error(`Could not find card with ID ${cardId} in main cards array during status update.`);
+                      moveToNextCard();
+                 }
+             }
+         }
+
+         function moveToNextCard() {
+             if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
+                  currentCardIndex++;
+                  if (currentCardIndex >= studyPile.length) {
+                      buildStudyPile(); // Reconstruye y baraja la pila del filtro actual
+                  }
+                  displayCurrentCard();
+             } else if (studyPile.length > 0){
+                  currentCardIndex = 0; // Empezar pila si estaba en -1
+                  displayCurrentCard();
+             } else {
+                  displayCurrentCard(); // Mostrar mensaje de pila vacía
+             }
+          }
+
+         function updatePilesView() {
              pileToLearnCount.textContent = cards.filter(c => c.status === 'to_learn').length;
-            pileAlmostCount.textContent = cards.filter(c => c.status === 'almost').length;
-            pileLearnedCount.textContent = cards.filter(c => c.status === 'learned').length;
-        }
-        function updateAllCardsView() { /* ... (sin cambios) ... */
-             allCardsTableBody.innerHTML = '';
-            if (cards.length === 0) {
-                allCardsTableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-400">No hay tarjetas cargadas.</td></tr>';
-                return;
-            }
-            const sortedCards = [...cards].sort((a, b) => a.id - b.id);
+             pileAlmostCount.textContent = cards.filter(c => c.status === 'almost').length;
+             pileLearnedCount.textContent = cards.filter(c => c.status === 'learned').length;
+         }
 
-            sortedCards.forEach((card) => {
-                const row = document.createElement('tr');
-                let statusText = '';
-                let statusClass = '';
-                switch (card.status) {
-                    case 'learned': statusText = 'Aprendido'; statusClass = 'status-learned font-semibold'; break;
-                    case 'almost': statusText = 'Repasando'; statusClass = 'status-almost font-semibold'; break;
-                    default: statusText = 'Por Aprender'; statusClass = 'status-to_learn font-semibold'; break;
-                }
-                row.innerHTML = `
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-300">${card.id + 1}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-400">${card.unidad}</td>
-                    <td class="px-4 py-2 text-sm text-gray-300">${card.pregunta}</td>
-                    <td class="px-4 py-2 text-sm text-gray-400">${card.respuesta}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm ${statusClass}">${statusText}</td>
-                `;
-                allCardsTableBody.appendChild(row);
-            });
-        }
-        function switchView(viewToShow) { /* ... (sin cambios) ... */
-            viewStudy.classList.add('view-hidden');
-            viewPiles.classList.add('view-hidden');
-            viewAll.classList.add('view-hidden');
+         function updateAllCardsView() {
+              allCardsTableBody.innerHTML = '';
+             if (cards.length === 0) {
+                 allCardsTableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-400">No hay tarjetas cargadas.</td></tr>';
+                 return;
+             }
+             // Ordenar por índice original para consistencia
+             const sortedCards = [...cards].sort((a, b) => a.originalIndex - b.originalIndex);
 
-            const targetView = document.getElementById(`view-${viewToShow}`);
-            if (targetView) {
-                targetView.classList.remove('view-hidden');
-            } else {
-                console.error(`View with ID 'view-${viewToShow}' not found.`);
-                viewStudy.classList.remove('view-hidden');
-                viewToShow = 'study';
-            }
-            currentView = viewToShow;
+             sortedCards.forEach((card) => {
+                  const row = document.createElement('tr');
+                  let statusText = '';
+                  let statusClass = '';
+                  switch (card.status) {
+                      case 'learned': statusText = 'Aprendido'; statusClass = 'status-learned font-semibold'; break;
+                      case 'almost': statusText = 'Repasando'; statusClass = 'status-almost font-semibold'; break;
+                      default: statusText = 'Por Aprender'; statusClass = 'status-to_learn font-semibold'; break;
+                  }
+                  row.innerHTML = `
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-300">${card.originalIndex + 1}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-400">${card.unidad}</td>
+                      <td class="px-4 py-2 text-sm text-gray-300">${card.pregunta}</td>
+                      <td class="px-4 py-2 text-sm text-gray-400">${card.respuesta}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm ${statusClass}">${statusText}</td>
+                  `;
+                  allCardsTableBody.appendChild(row);
+              });
+         }
 
-            document.querySelectorAll('#sidebar nav button').forEach(btn => {
-                btn.classList.remove('bg-gray-700', 'text-white');
-                btn.classList.add('text-gray-200', 'hover:bg-gray-700');
-            });
-            const activeButton = document.getElementById(`btn-view-${viewToShow}`);
-            if (activeButton) {
-                activeButton.classList.add('bg-gray-700', 'text-white');
-                activeButton.classList.remove('text-gray-200');
-            }
+         function switchView(viewToShow) {
+              viewStudy.classList.add('view-hidden');
+              viewPiles.classList.add('view-hidden');
+              viewAll.classList.add('view-hidden');
+              const targetView = document.getElementById(`view-${viewToShow}`);
+              if (targetView) { targetView.classList.remove('view-hidden'); }
+              else { viewStudy.classList.remove('view-hidden'); viewToShow = 'study';}
+              currentView = viewToShow;
 
-            if (viewToShow === 'piles') {
-                updatePilesView();
-            } else if (viewToShow === 'all') {
-                updateAllCardsView();
-            } else if (viewToShow === 'study') {
-                if (currentCardIndex === -1 && cards.some(c => c.status === 'to_learn' || c.status === 'almost')) {
-                    console.log("Rebuilding study pile on switching back to study view as it was empty.");
-                    buildStudyPile();
-                }
-                displayCurrentCard(); // Asegura mostrar tarjeta/mensaje correcto
-            }
+              document.querySelectorAll('#sidebar nav button').forEach(btn => {
+                  btn.classList.remove('bg-gray-700', 'text-white');
+                  btn.classList.add('text-gray-200', 'hover:bg-gray-700');
+              });
+              const activeButton = document.getElementById(`btn-view-${viewToShow}`);
+              if (activeButton) {
+                  activeButton.classList.add('bg-gray-700', 'text-white');
+                  activeButton.classList.remove('text-gray-200');
+              }
 
-            if (window.innerWidth < 768) {
-                closeSidebar();
-            }
-        }
-        function updateAllViews() { /* ... (sin cambios) ... */
-              updatePilesView();
-             if (currentView === 'study') {
-                displayCurrentCard();
-            } else if (currentView === 'all') {
-                updateAllCardsView();
-            }
-        }
-        function resetProgress() { /* ... (sin cambios) ... */
-             if (confirm("¿Estás seguro de que quieres reiniciar todo tu progreso? Todas las tarjetas volverán al estado 'Por Aprender'.")) {
-                initializeCards();
-                buildStudyPile();
-                updateAllViews();
-                switchView('study');
-                console.log("Progress reset.");
-            }
-        }
-        function openSidebar() { /* ... (sin cambios) ... */
-             sidebar.style.transform = 'translateX(0)';
-            sidebarOverlay.classList.add('visible');
-        }
-        function closeSidebar() { /* ... (sin cambios) ... */
-            sidebar.style.transform = 'translateX(-100%)';
-            sidebarOverlay.classList.remove('visible');
-        }
+               // Mostrar/Ocultar filtro solo en la vista de estudio
+               unitFilterSelect.parentElement.style.display = (viewToShow === 'study') ? 'block' : 'none';
+
+              if (viewToShow === 'piles') updatePilesView();
+              else if (viewToShow === 'all') updateAllCardsView();
+              else if (viewToShow === 'study') {
+                  // displayCurrentCard se encarga de mostrar la tarjeta correcta para el filtro
+                  displayCurrentCard();
+              }
+
+              if (window.innerWidth < 768) closeSidebar();
+         }
+
+         function updateAllViews() {
+             updatePilesView();
+             if (currentView === 'study') displayCurrentCard();
+             else if (currentView === 'all') updateAllCardsView();
+         }
+
+         function resetProgress() {
+              if (confirm("¿Estás seguro de que quieres reiniciar todo tu progreso GLOBAL? Todas las tarjetas de TODAS las unidades volverán al estado 'Por Aprender'.")) {
+                 initializeCards();
+                 buildStudyPile();
+                 updateAllViews();
+                 switchView('study');
+                 console.log("Progress reset globally.");
+             }
+         }
+
+          function getUniqueUnits() {
+              const units = new Set(cards.map(card => card.unidad));
+              // Ordenar alfabéticamente, poniendo 'all' primero si existe
+              const sortedUnits = [...units].sort((a, b) => a.localeCompare(b));
+              return ['all', ...sortedUnits];
+          }
+
+          function populateUnitFilter() {
+              unitFilterSelect.innerHTML = '';
+              const units = getUniqueUnits();
+              units.forEach(unit => {
+                  const option = document.createElement('option');
+                  option.value = unit;
+                  option.textContent = (unit === 'all') ? 'Todas las Unidades' : unit;
+                  unitFilterSelect.appendChild(option);
+              });
+          }
+
+          function applyUnitFilter(unit) {
+              console.log("Applying filter:", unit);
+              selectedUnitFilter = unit;
+              saveState();
+              buildStudyPile();
+              displayCurrentCard();
+          }
+
+         function openSidebar() {
+              sidebar.style.transform = 'translateX(0)';
+             sidebarOverlay.classList.add('visible');
+          }
+         function closeSidebar() {
+             sidebar.style.transform = 'translateX(-100%)';
+             sidebarOverlay.classList.remove('visible');
+         }
 
         // --- Event Listeners ---
-        cardContainer.addEventListener('click', flipCard); // <--- Listener para voltear
+        cardContainer.addEventListener('click', flipCard);
         btnNotLearned.addEventListener('click', () => updateCardStatus('to_learn'));
         btnAlmost.addEventListener('click', () => updateCardStatus('almost'));
         btnLearned.addEventListener('click', () => updateCardStatus('learned'));
@@ -635,10 +690,13 @@
         openSidebarBtn.addEventListener('click', openSidebar);
         closeSidebarBtn.addEventListener('click', closeSidebar);
         sidebarOverlay.addEventListener('click', closeSidebar);
+        unitFilterSelect.addEventListener('change', (event) => {
+            applyUnitFilter(event.target.value);
+        });
 
         // --- Inicialización ---
-        document.addEventListener('DOMContentLoaded', () => { /* ... (sin cambios) ... */
-              console.log("DOM loaded. Initializing application...");
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM loaded. Initializing application...");
             loadState();
             switchView('study');
             console.log("Application initialized successfully.");
