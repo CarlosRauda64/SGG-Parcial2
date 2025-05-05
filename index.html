@@ -3,120 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards SIG</title>
+    <title>Flashcards SIG - Modo Oscuro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos para la animación de volteo */
-        .flashcard {
-            backface-visibility: hidden;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            cursor: pointer;
-        }
-        .flashcard-container.flipped .flashcard-front {
-            transform: rotateY(180deg);
-        }
-        .flashcard-container.flipped .flashcard-back {
-            transform: rotateY(0deg);
-        }
-        .flashcard-back {
-            transform: rotateY(-180deg);
-        }
-        /* Clase para ocultar/mostrar vistas */
+        /* Clase para ocultar vistas */
         .view-hidden {
             display: none;
         }
+
+        /* --- Estilos del Sidebar (Sin cambios respecto a la versión anterior) --- */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(-100%);
+        }
+        @media (min-width: 768px) {
+            #sidebar {
+                transform: translateX(0);
+            }
+            #main-content {
+                margin-left: 16rem; /* w-64 */
+            }
+            #open-sidebar-btn, #close-sidebar-btn, #sidebar-overlay {
+                display: none;
+            }
+        }
+        #sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        #sidebar-overlay.visible {
+             opacity: 0.75;
+             pointer-events: auto;
+        }
+        /* --- Fin Estilos Sidebar --- */
+
+        /* --- Estilos Simplificados para la Tarjeta Única --- */
+        .flashcard-container {
+            position: relative; /* Mantenido por si se necesita posicionar algo dentro */
+            cursor: pointer; /* Hacer toda el área clickeable */
+        }
+        /* Estilo base para el contenido de la tarjeta */
+        #flashcard-content {
+             transition: background-color 0.3s ease, border-color 0.3s ease; /* Transición suave de color */
+             width: 100%;
+             height: 100%;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             overflow: auto; /* Para respuestas largas */
+        }
+        /* Clases para alternar estilos */
+        .card-question-style {
+            background-color: #DBEAFE; /* bg-blue-100 */
+            border-color: #93C5FD; /* border-blue-300 */
+        }
+        .card-answer-style {
+            background-color: #D1FAE5; /* bg-green-100 */
+            border-color: #6EE7B7; /* border-green-300 */
+        }
+        /* --- Fin Estilos Tarjeta Única --- */
+
+
+        /* Estilos adicionales para modo oscuro */
+        body { color: #e5e7eb; /* gray-200 */ }
+        #card-text { color: #1f2937; /* gray-800 */ } /* Texto oscuro en ambas caras */
+        #pile-to-learn-count, #pile-almost-count, #pile-learned-count { color: #1f2937; /* gray-800 */ }
+        #all-cards-table-body td { color: #d1d5db; /* gray-300 */ }
+        #all-cards-table-body .status-learned { color: #34d399 !important; }
+        #all-cards-table-body .status-almost { color: #f59e0b !important; }
+        #all-cards-table-body .status-to_learn { color: #ef4444 !important; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans flex flex-col min-h-screen">
+<body class="bg-gray-900 font-sans flex flex-col min-h-screen">
 
-    <header class="bg-blue-600 text-white p-4 shadow-md">
-        <h1 class="text-2xl font-bold text-center">Estudio de Flashcards SIG</h1>
-    </header>
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-gray-800 text-gray-200 p-4 shadow-lg z-50 border-r border-gray-700">
+        <button id="close-sidebar-btn" class="absolute top-2 right-2 text-gray-400 hover:text-white md:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+        <h2 class="text-xl font-bold mb-6 text-white">Navegación</h2>
+        <nav class="flex flex-col space-y-3">
+            <button id="btn-view-study" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Estudiar</button>
+            <button id="btn-view-piles" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Pilas</button>
+            <button id="btn-view-all" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Todas</button>
+        </nav>
+    </aside>
 
-    <nav class="bg-blue-500 p-2 flex justify-center space-x-4 shadow">
-        <button id="btn-view-study" class="text-white hover:bg-blue-700 px-3 py-1 rounded transition duration-200">Estudiar</button>
-        <button id="btn-view-piles" class="text-white hover:bg-blue-700 px-3 py-1 rounded transition duration-200">Pilas</button>
-        <button id="btn-view-all" class="text-white hover:bg-blue-700 px-3 py-1 rounded transition duration-200">Todas</button>
-    </nav>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black z-40 md:hidden"></div>
 
-    <main class="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+    <div id="main-content" class="flex flex-col flex-grow transition-all duration-300 ease-in-out">
+         <header class="bg-gray-800 text-white p-4 shadow-md flex items-center border-b border-gray-700">
+            <button id="open-sidebar-btn" class="text-gray-300 hover:text-white mr-4 md:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+            <h1 class="text-2xl font-bold text-center flex-grow">Estudio de Flashcards SIG</h1>
+        </header>
 
-        <section id="view-study" class="">
-            <div id="study-area" class="bg-white p-6 rounded-lg shadow-lg max-w-xl mx-auto text-center">
-                <p id="progress-counter" class="text-sm text-gray-500 mb-4">Tarjeta X de Y</p>
-                <div id="flashcard-container" class="flashcard-container perspective-[1000px] h-64 mb-6">
-                    <div class="relative w-full h-full">
-                        <div id="flashcard-front" class="flashcard absolute w-full h-full bg-blue-100 border border-blue-300 rounded-lg shadow p-4 flex items-center justify-center">
-                            <p id="card-question" class="text-lg md:text-xl"></p>
-                        </div>
-                        <div id="flashcard-back" class="flashcard absolute w-full h-full bg-green-100 border border-green-300 rounded-lg shadow p-4 flex items-center justify-center overflow-auto">
-                            <p id="card-answer" class="text-base md:text-lg"></p>
-                        </div>
+        <main class="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+
+            <section id="view-study" class="">
+                <div id="study-area" class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-xl mx-auto text-center border border-gray-700">
+                    <p id="progress-counter" class="text-sm text-gray-400 mb-4">Cargando...</p>
+                    <div id="flashcard-container" class="flashcard-container h-64 mb-6">
+                        <div id="flashcard-content" class="border rounded-lg shadow p-4 h-full">
+                             <p id="card-text" class="text-lg md:text-xl"></p> </div>
                     </div>
-                </div>
 
-                <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-                    <button id="btn-not-learned" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto">
-                        No aprendido
+                    <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                        <button id="btn-not-learned" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto" disabled>No aprendido</button>
+                        <button id="btn-almost" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto" disabled>Repasar</button>
+                        <button id="btn-learned" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto" disabled>Aprendido</button>
+                    </div>
+                    <p id="study-complete-message" class="mt-6 text-green-400 font-semibold text-xl view-hidden">¡Felicidades! Has completado todas las tarjetas.</p>
+                    <p id="loading-error-message" class="mt-6 text-red-400 font-semibold text-xl view-hidden">Error al procesar las tarjetas.</p>
+                </div>
+            </section>
+
+            <section id="view-piles" class="view-hidden">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md mx-auto text-center border border-gray-700">
+                    <h2 class="text-xl font-semibold mb-4 text-white">Estado de las Pilas</h2>
+                    <div class="space-y-3">
+                        <div class="bg-red-200 p-3 rounded text-gray-900">Por Aprender: <span id="pile-to-learn-count" class="font-bold">0</span></div>
+                        <div class="bg-yellow-200 p-3 rounded text-gray-900">Repasando: <span id="pile-almost-count" class="font-bold">0</span></div>
+                        <div class="bg-green-200 p-3 rounded text-gray-900">Aprendido: <span id="pile-learned-count" class="font-bold">0</span></div>
+                    </div>
+                    <button id="btn-reset-progress" class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow">
+                        Reiniciar Progreso
                     </button>
-                    <button id="btn-almost" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto">
-                        Casi casi
-                    </button>
-                    <button id="btn-learned" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow w-full sm:w-auto">
-                        Aprendido
-                    </button>
                 </div>
-                 <p id="study-complete-message" class="mt-6 text-green-700 font-semibold text-xl view-hidden">¡Felicidades! Has completado todas las tarjetas.</p>
-                 <p id="loading-error-message" class="mt-6 text-red-700 font-semibold text-xl view-hidden">Error al cargar las tarjetas.</p> </div>
-        </section>
+            </section>
 
-        <section id="view-piles" class="view-hidden">
-            <div class="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto text-center">
-                <h2 class="text-xl font-semibold mb-4">Estado de las Pilas</h2>
-                <div class="space-y-3">
-                    <div class="bg-blue-100 p-3 rounded">Por Aprender: <span id="pile-to-learn-count" class="font-bold">0</span></div>
-                    <div class="bg-yellow-100 p-3 rounded">Casi Aprendido: <span id="pile-almost-count" class="font-bold">0</span></div>
-                    <div class="bg-green-100 p-3 rounded">Aprendido: <span id="pile-learned-count" class="font-bold">0</span></div>
-                </div>
-                 <button id="btn-reset-progress" class="mt-6 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow">
-                    Reiniciar Progreso
-                </button>
-            </div>
-        </section>
+            <section id="view-all" class="view-hidden">
+                 <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg max-w-4xl mx-auto border border-gray-700">
+                     <h2 class="text-xl font-semibold mb-4 text-center text-white">Todas las Tarjetas</h2>
+                     <div class="overflow-x-auto">
+                         <table class="min-w-full divide-y divide-gray-700">
+                             <thead class="bg-gray-700">
+                                 <tr>
+                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
+                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Unidad</th>
+                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Pregunta</th>
+                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Respuesta</th>
+                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Estado</th>
+                                 </tr>
+                             </thead>
+                             <tbody id="all-cards-table-body" class="bg-gray-800 divide-y divide-gray-700">
+                                 <tr><td colspan="5" class="text-center p-4 text-gray-400">Cargando tarjetas...</td></tr>
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+            </section>
 
-        <section id="view-all" class="view-hidden">
-             <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
-                <h2 class="text-xl font-semibold mb-4 text-center">Todas las Tarjetas</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unidad</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pregunta</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Respuesta</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="all-cards-table-body" class="bg-white divide-y divide-gray-200">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+        </main>
 
-    </main>
-
-    <footer class="bg-gray-200 text-center text-sm text-gray-600 p-3 mt-8">
-        Aplicación de Flashcards
-    </footer>
+        <footer class="bg-gray-800 text-center text-sm text-gray-400 p-3 mt-8 border-t border-gray-700">
+            Aplicación de Flashcards
+        </footer>
+    </div>
 
     <script>
-        // --- Datos de Flashcards (Incrustados) ---
-        // Estos datos provienen del archivo JSON que generamos anteriormente
-        const flashcardsData = [
-          { "unidad": "III-B", "pregunta": "¿Cuál era la principal fuente de datos para los SIG en sus inicios y qué proceso era necesario?", "respuesta": "La principal fuente era la cartografía en papel. Era necesaria la digitalización para convertir los datos impresos a formato digital manejable por un SIG." },
+        // --- Datos de Flashcards (Embebidos) ---
+        const flashcardsData = [ /* ... (mismos datos que antes) ... */
+             { "unidad": "III-B", "pregunta": "¿Cuál era la principal fuente de datos para los SIG en sus inicios y qué proceso era necesario?", "respuesta": "La principal fuente era la cartografía en papel. Era necesaria la digitalización para convertir los datos impresos a formato digital manejable por un SIG." },
           { "unidad": "III-B", "pregunta": "¿Qué condiciona la forma en que los datos geográficos llegan a nosotros y el uso que les podemos dar en un SIG?", "respuesta": "La metodología seguida en la recolección de los datos geográficos condiciona directamente su forma y, por tanto, su uso o las operaciones necesarias para adaptarlos." },
           { "unidad": "III-B", "pregunta": "Define datos geográficos digitales y analógicos.", "respuesta": "Digitales: Valores numéricos que alimentan una aplicación informática (SIG). Analógicos: Datos en formatos no digitales (mapas, fotos aéreas impresas, etc.)." },
           { "unidad": "III-B", "pregunta": "Menciona las 5 ventajas principales de los datos digitales sobre los analógicos.", "respuesta": "1. Sencillez de actualización. 2. Facilidad de distribución. 3. Menor espacio de almacenamiento. 4. Mayor facilidad y precisión de análisis. 5. Facilidad de mantenimiento." },
@@ -143,7 +192,7 @@
           { "unidad": "III-B", "pregunta": "Describe los tipos principales de receptores GPS según su uso.", "respuesta": "1. Uso general (bajo coste, portátiles, para ocio, navegación). 2. Medición topográfica (mayor precisión, antena externa, uso profesional SIG). 3. Medición del tiempo (fijos, alta precisión temporal)." },
           { "unidad": "III-B", "pregunta": "¿Cómo se integra el GPS con los SIG?", "respuesta": "Como fuente de datos estática (crear capas a partir de datos de campo) o para obtención de datos en tiempo real (SIG móviles). Permite capturar componente espacial y, a menudo, temática (atributos)." },
           { "unidad": "III-B", "pregunta": "¿Qué es la Información Geográfica Voluntaria (VGI) o Participativa?", "respuesta": "Es el uso de Internet para crear, gestionar y difundir información geográfica aportada voluntariamente por usuarios (neogeografía), democratizando la creación cartográfica." },
-          { "unidad": "III-B", "pregunta": "¿Cuáles son algunas críticas o problemas asociados a la VGI?", "respuesta": "La calidad de la información puede ser variable al provenir de no expertos y usar equipo de bajo coste, aunque para ciertos tipos de datos (ej. puntos de interés) puede ser suficiente." },
+          { "unidad": "III-B", "pregunta": "¿Cuáles son algunas críticas o problemas asociados a la VGI?", "respuesta": "La calidad de la información puede ser variable al provenir de no expertos y usar equipo de bajo coste, aunque para certos tipos de datos (ej. puntos de interés) puede ser suficiente." },
           { "unidad": "III-B", "pregunta": "¿Por qué es importante la cartografía de elevaciones en SIG?", "respuesta": "Porque casi todos los procesos estudiados en SIG tienen relación con el relieve, y una capa de elevación aporta amplia información sobre ellos." },
           { "unidad": "III-B", "pregunta": "Enumera las metodologías mencionadas para obtener cartografía de elevaciones.", "respuesta": "GPS, Digitalización de curvas de nivel, Estereografía, Interferometría (Radar, SRTM), LIDAR." },
           { "unidad": "III-B", "pregunta": "¿Qué es un archivo 'World File' y para qué sirve?", "respuesta": "Es un pequeño archivo de texto plano que acompaña a un archivo de imagen y contiene los datos de georreferencia (tamaño de píxel, coordenadas de esquina, rotación) para que el SIG pueda ubicarla espacialmente. Su extensión se forma con la primera y última letra de la extensión de la imagen + 'w' (ej. .tfw para .tif)." },
@@ -163,7 +212,7 @@
           { "unidad": "IV-A", "pregunta": "¿Por qué se dice que los SIG son herramientas versátiles?", "respuesta": "Porque pueden adaptarse a circunstancias particulares de muchas disciplinas, utilizando prioritariamente distintas capacidades (análisis, visualización, manejo de datos) según las necesidades." },
           { "unidad": "IV-A", "pregunta": "¿Qué porcentaje estimado de bases de datos administrativas son susceptibles de ser georreferenciadas?", "respuesta": "Más del 80%." },
           { "unidad": "IV-A", "pregunta": "Menciona algunos factores para clasificar los ámbitos de aplicación de los SIG.", "respuesta": "Procesos de interés, tipo de datos, volumen de datos, precisión necesaria, tipo de usuarios, complejidad de operaciones, adecuación del SIG a las necesidades." },
-          { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta modelizadora.", "respuesta": "Permite modelizar realidades geográficas complejas combinando análisis sencillos en flujos de trabajo, adecuados para modelos conceptuales/matemáticos, estáticos/dinámicos." },
+          { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta modelizadora.", "respuesta": "Permite modelizar realidades geográficas complexas combinando análisis sencillos en flujos de trabajo, adecuados para modelos conceptuales/matemáticos, estáticos/dinámicos." },
           { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta para la toma de decisiones.", "respuesta": "Facilita combinar y visualizar globalmente múltiples variables (capas) para generar resultados que apoyen la interpretación de expertos y la toma de decisiones informadas." },
           { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta para la difusión de información geográfica.", "respuesta": "Permite exponer datos geográficos de forma óptima a públicos amplios (incluyendo no técnicos vía web), añadiendo valor espacial a la información." },
           { "unidad": "IV-A", "pregunta": "Describe el rol del SIG como herramienta centralizadora.", "respuesta": "Actúa como sistema para gestionar y coordinar información geográfica y tareas de equipos en organizaciones (ej. SIG corporativo), donde la gestión de la base de datos es vital." },
@@ -220,7 +269,7 @@
           { "unidad": "IV-B", "pregunta": "¿Cómo ayudan los SIG al catastro?", "respuesta": "Permiten estructurar, visualizar y gestionar información espacialmente, asociando datos diversos al territorio, mejorando la planificación, la calidad del servicio y la eficiencia." },
           { "unidad": "IV-B", "pregunta": "¿Qué componentes integran la plena identificación catastral?", "respuesta": "La suma de información cartográfica (SIG) e información alfanumérica descriptiva (suelo, construcciones)." },
           { "unidad": "IV-B", "pregunta": "Menciona algunas explotaciones específicas de los datos catastrales usando SIG.", "respuesta": "Análisis físico (dimensiones, formas); análisis temporal (antigüedad edificios); análisis de usos del suelo (geomarketing); planeamiento urbanístico (alturas, edificabilidad, inventario suelo); demografía (estimación población por parcela)." },
-          { "unidad": "IV-B", "pregunta": "¿Qué permite la construcción de modelos 3D catastrales?", "respuesta": "Inventariar la información catastral de los inmuebles con detalle tridimensional, garantizando la plena identificación en ciudades complejas." },
+          { "unidad": "IV-B", "pregunta": "¿Qué permite la construcción de modelos 3D catastrales?", "respuesta": "Inventariar la información catastral de los inmuebles con detalle tridimensional, garantizando la plena identificación en ciudades complexas." },
           { "unidad": "IV-B", "pregunta": "¿Cuál era la limitación de almacenar información catastral jurídica, económica y física solo en bases de datos alfanuméricas?", "respuesta": "La dificultad de relacionarla con el territorio donde se ubican los inmuebles." },
           { "unidad": "IV-B", "pregunta": "¿Qué beneficios aporta la integración de bases de datos geográficas (BDG) y alfanuméricas (BDA) en un SIG Catastral?", "respuesta": "Garantiza integridad, consistencia y veracidad de la información; permite cálculo automatizado de áreas; posibilita ubicación espacial y relación entre inmuebles." },
           { "unidad": "IV-B", "pregunta": "¿Por qué es fundamental registrar los cambios catastrales en el tiempo?", "respuesta": "Porque la dinámica inmobiliaria es constante y registrarla permite ver la evolución de los predios, analizarla en retrospectiva y tomar decisiones de planificación futuras." },
@@ -246,22 +295,31 @@
           { "unidad": "IV-B", "pregunta": "¿Qué aspectos considerar al elegir una proyección?", "respuesta": "Tamaño del área (global vs local), localización (ecuador, polos, lat. medias), forma del área, propósito del mapa (conservar áreas, formas, distancias, etc.)." },
           { "unidad": "IV-B", "pregunta": "Diferencia entre Conversión y Transformación de coordenadas.", "respuesta": "Conversión: Entre sistemas con el mismo datum (exacta). Transformación: Entre sistemas con diferente datum (más compleja, puede no ser exacta)." },
           { "unidad": "IV-B", "pregunta": "¿Cómo manejan los SIG los diferentes sistemas de coordenadas?", "respuesta": "Incorporan funciones para cambiar coordenadas (conversión/transformación) o realizan transformaciones 'al vuelo' (en tiempo real) si los datos tienen definida su proyección original." }
+
         ];
 
+        // --- Estado Global de la Aplicación ---
+        let cards = [];
+        let currentCardIndex = -1;
+        let studyPile = [];
+        let isFlipped = false; // Indica si la tarjeta única está mostrando la respuesta
+        let currentView = 'study';
 
-        // --- Estado de la Aplicación ---
-        let cards = []; // Array para almacenar las tarjetas con su estado
-        let currentCardIndex = -1; // Índice de la tarjeta actual en la pila de estudio
-        let studyPile = []; // Índices de las tarjetas a estudiar ('to_learn' y 'almost')
-        let isFlipped = false; // Estado de si la tarjeta actual está volteada
-        let currentView = 'study'; // Vista actual ('study', 'piles', 'all')
+        // --- Referencias a Elementos del DOM ---
+        const sidebar = document.getElementById('sidebar');
+        const openSidebarBtn = document.getElementById('open-sidebar-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const mainContent = document.getElementById('main-content');
 
-        // --- Elementos del DOM ---
+        // Referencias para la tarjeta única
         const cardContainer = document.getElementById('flashcard-container');
-        const cardQuestion = document.getElementById('card-question');
-        const cardAnswer = document.getElementById('card-answer');
+        const cardContent = document.getElementById('flashcard-content'); // El div que cambia de color
+        const cardText = document.getElementById('card-text'); // El párrafo dentro del div
+
         const progressCounter = document.getElementById('progress-counter');
         const studyCompleteMessage = document.getElementById('study-complete-message');
+        const loadingErrorMessage = document.getElementById('loading-error-message');
 
         const btnNotLearned = document.getElementById('btn-not-learned');
         const btnAlmost = document.getElementById('btn-almost');
@@ -281,262 +339,309 @@
         const pileLearnedCount = document.getElementById('pile-learned-count');
         const allCardsTableBody = document.getElementById('all-cards-table-body');
 
-        // --- Funciones ---
+        // --- Funciones Principales ---
 
-        // Baraja un array (Algoritmo Fisher-Yates)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
+        function shuffleArray(array) { /* ... (sin cambios) ... */
+             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]]; // Intercambio de elementos
+                [array[i], array[j]] = [array[j], array[i]];
             }
         }
-
-        // Guarda el estado actual de las tarjetas en Local Storage
-        function saveState() {
-            try {
-                // Guardar solo los estados, no los datos completos
+        function saveState() { /* ... (sin cambios) ... */
+             try {
                 const cardStates = cards.map(card => ({ id: card.id, status: card.status }));
                 localStorage.setItem('flashcardsAppState', JSON.stringify(cardStates));
             } catch (e) {
                 console.error("Error saving state to localStorage:", e);
             }
         }
+        function loadState() { /* ... (sin cambios) ... */
+             const savedStates = localStorage.getItem('flashcardsAppState');
+            let states = {};
+            let errorLoadingState = false;
 
-        // Carga el estado de las tarjetas desde Local Storage o inicializa
-        function loadState() {
-            const savedStates = localStorage.getItem('flashcardsAppState');
-            let states = {}; // Objeto para mapear id -> status
             if (savedStates) {
                 try {
-                    JSON.parse(savedStates).forEach(state => {
-                        states[state.id] = state.status;
-                    });
+                    JSON.parse(savedStates).forEach(state => { states[state.id] = state.status; });
+                    console.log("Loaded states from localStorage.");
                 } catch (e) {
                     console.error("Error parsing saved state:", e);
-                    // Si hay error, se usarán los estados por defecto
+                    errorLoadingState = true; // Marcar error para inicializar
                 }
+            } else {
+                errorLoadingState = true; // No hay estado guardado, inicializar
             }
 
-            // Inicializar 'cards' combinando datos originales y estados guardados
             cards = flashcardsData.map((cardData, index) => ({
                 ...cardData,
-                id: index, // Usar índice como ID consistente
-                status: states[index] || 'to_learn' // Estado guardado o 'to_learn'
+                id: index,
+                status: !errorLoadingState && states[index] ? states[index] : 'to_learn'
             }));
+
+            if (errorLoadingState) {
+                console.log("Initializing card states to 'to_learn'.");
+                saveState();
+            }
 
             buildStudyPile();
             updateAllViews();
         }
-
-        // Inicializa las tarjetas (resetea estados)
-        function initializeCards() {
-            cards.forEach(card => card.status = 'to_learn');
-            saveState(); // Guardar el estado reseteado
+        function initializeCards() { /* ... (sin cambios) ... */
+             cards.forEach(card => card.status = 'to_learn');
+            saveState();
+            console.log("Card states initialized to 'to_learn'.");
         }
-
-        // Construye la pila de estudio con tarjetas 'to_learn' y 'almost'
-        function buildStudyPile() {
-            studyPile = cards
+        function buildStudyPile() { /* ... (sin cambios) ... */
+             studyPile = cards
                 .filter(card => card.status === 'to_learn' || card.status === 'almost')
-                .map(card => card.id); // Usar IDs
+                .map(card => card.id);
             shuffleArray(studyPile);
             currentCardIndex = studyPile.length > 0 ? 0 : -1;
+            console.log(`Study pile built/rebuilt with ${studyPile.length} cards.`);
         }
 
-        // Muestra la tarjeta actual en la vista de estudio
+        /**
+         * Muestra la tarjeta actual (pregunta) en la interfaz o el mensaje de completado.
+         */
         function displayCurrentCard() {
-            isFlipped = false;
-            cardContainer.classList.remove('flipped'); // Mostrar pregunta primero
+            isFlipped = false; // Siempre mostrar la pregunta primero
 
             if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
                 const cardId = studyPile[currentCardIndex];
-                const card = cards.find(c => c.id === cardId); // Encontrar por ID
+                const card = cards.find(c => c.id === cardId);
+
                 if (card) {
-                    cardQuestion.textContent = card.pregunta;
-                    cardAnswer.textContent = card.respuesta;
+                    // Configurar tarjeta para mostrar la PREGUNTA
+                    cardText.textContent = card.pregunta;
+                    cardContent.classList.remove('card-answer-style'); // Quitar estilo respuesta
+                    cardContent.classList.add('card-question-style'); // Poner estilo pregunta
+
                     progressCounter.textContent = `Tarjeta ${currentCardIndex + 1} de ${studyPile.length}`;
                     studyCompleteMessage.classList.add('view-hidden');
-                    // Habilitar botones
+                    loadingErrorMessage.classList.add('view-hidden');
+
                     btnNotLearned.disabled = false;
                     btnAlmost.disabled = false;
                     btnLearned.disabled = false;
                     cardContainer.style.cursor = 'pointer';
                 } else {
-                    console.warn(`Card with ID ${cardId} not found.`);
-                    moveToNextCard(); // Intentar saltar si no se encuentra
+                    console.error(`Card with ID ${cardId} from studyPile not found.`);
+                    loadingErrorMessage.textContent = `Error: Tarjeta ${cardId} no encontrada. Saltando...`;
+                    loadingErrorMessage.classList.remove('view-hidden');
+                    studyPile.splice(currentCardIndex, 1);
+                    if (currentCardIndex >= studyPile.length) {
+                         currentCardIndex = studyPile.length > 0 ? 0 : -1;
+                    }
+                    displayCurrentCard(); // Intentar mostrar la siguiente
                 }
             } else {
-                // No hay más tarjetas
-                cardQuestion.textContent = '';
-                cardAnswer.textContent = '';
-                progressCounter.textContent = 'Pila de estudio vacía';
-                studyCompleteMessage.classList.remove('view-hidden');
-                // Deshabilitar botones
+                // Pila de estudio vacía
+                cardText.textContent = ''; // Limpiar texto
+                // Quitar estilos específicos por si acaso
+                cardContent.classList.remove('card-question-style', 'card-answer-style');
+
+                if (cards.length > 0) {
+                     progressCounter.textContent = '¡Pila de estudio completada!';
+                    studyCompleteMessage.classList.remove('view-hidden');
+                } else {
+                    progressCounter.textContent = 'No hay tarjetas cargadas.';
+                    studyCompleteMessage.classList.add('view-hidden');
+                }
+                loadingErrorMessage.classList.add('view-hidden');
+
                 btnNotLearned.disabled = true;
                 btnAlmost.disabled = true;
                 btnLearned.disabled = true;
-                 cardContainer.style.cursor = 'default';
+                cardContainer.style.cursor = 'default';
             }
         }
 
-        // Voltea la tarjeta actual
+        /**
+         * Alterna entre mostrar la pregunta y la respuesta en la tarjeta única.
+         */
         function flipCard() {
-             if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
-                isFlipped = !isFlipped;
-                cardContainer.classList.toggle('flipped');
+            if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
+                const cardId = studyPile[currentCardIndex];
+                const card = cards.find(c => c.id === cardId);
+
+                if (!card) return; // Salir si no se encuentra la tarjeta actual
+
+                isFlipped = !isFlipped; // Cambiar el estado
+
+                if (isFlipped) {
+                    // Mostrar RESPUESTA (verde)
+                    cardText.textContent = card.respuesta;
+                    cardContent.classList.remove('card-question-style');
+                    cardContent.classList.add('card-answer-style');
+                } else {
+                    // Mostrar PREGUNTA (azul)
+                    cardText.textContent = card.pregunta;
+                    cardContent.classList.remove('card-answer-style');
+                    cardContent.classList.add('card-question-style');
+                }
             }
         }
 
-        // Actualiza el estado de la tarjeta actual y pasa a la siguiente
-        function updateCardStatus(newStatus) {
-            if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
+        function updateCardStatus(newStatus) { /* ... (lógica sin cambios) ... */
+             if (currentCardIndex !== -1 && currentCardIndex < studyPile.length) {
                 const cardId = studyPile[currentCardIndex];
                 const cardArrayIndex = cards.findIndex(c => c.id === cardId);
 
                 if (cardArrayIndex !== -1) {
                     cards[cardArrayIndex].status = newStatus;
-                    saveState();
+                    saveState(); // Guardar el nuevo estado
 
-                    // Lógica de avance
+                    let nextIndex = currentCardIndex;
+
                     if (newStatus === 'learned') {
-                         studyPile.splice(currentCardIndex, 1); // Quitar de la pila actual
-                         // Si era la última, ajustar índice
-                         if (currentCardIndex >= studyPile.length) {
-                              currentCardIndex = studyPile.length > 0 ? 0 : -1;
-                         }
-                         // Si no, el índice actual ya apunta a la siguiente
+                        studyPile.splice(currentCardIndex, 1);
+                        if (nextIndex >= studyPile.length) {
+                            nextIndex = studyPile.length > 0 ? 0 : -1;
+                        }
                     } else {
-                        // 'to_learn' o 'almost', pasar a la siguiente
-                        currentCardIndex++;
-                        // Si se acabó la pila, reconstruir y barajar
-                        if (currentCardIndex >= studyPile.length) {
+                        nextIndex++;
+                        if (nextIndex >= studyPile.length) {
+                             console.log("End of current study pile iteration reached. Rebuilding and shuffling.");
                              buildStudyPile();
+                             nextIndex = currentCardIndex;
                         }
                     }
-                    updateAllViews(); // Actualizar interfaz
+                    currentCardIndex = nextIndex;
+                    updateAllViews(); // Actualiza UI, incluyendo displayCurrentCard
+
                 } else {
-                     console.error(`Could not find card with ID ${cardId} in main cards array.`);
+                    console.error(`Could not find card with ID ${cardId} in main cards array during status update.`);
+                     moveToNextCard();
                 }
             }
         }
-
-        // Mueve a la siguiente tarjeta (usado en caso de error)
-        function moveToNextCard() {
+        function moveToNextCard() { /* ... (sin cambios) ... */
              if (currentCardIndex !== -1) {
                  currentCardIndex++;
                  if (currentCardIndex >= studyPile.length) {
                      buildStudyPile();
                  }
                  displayCurrentCard();
-             }
+            }
         }
-
-        // Actualiza los contadores en la vista de pilas
-        function updatePilesView() {
-            pileToLearnCount.textContent = cards.filter(c => c.status === 'to_learn').length;
+        function updatePilesView() { /* ... (sin cambios) ... */
+             pileToLearnCount.textContent = cards.filter(c => c.status === 'to_learn').length;
             pileAlmostCount.textContent = cards.filter(c => c.status === 'almost').length;
             pileLearnedCount.textContent = cards.filter(c => c.status === 'learned').length;
         }
+        function updateAllCardsView() { /* ... (sin cambios) ... */
+             allCardsTableBody.innerHTML = '';
+            if (cards.length === 0) {
+                allCardsTableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-400">No hay tarjetas cargadas.</td></tr>';
+                return;
+            }
+            const sortedCards = [...cards].sort((a, b) => a.id - b.id);
 
-        // Rellena la tabla en la vista de todas las tarjetas
-        function updateAllCardsView() {
-            allCardsTableBody.innerHTML = ''; // Limpiar tabla
-            cards.forEach((card, index) => {
+            sortedCards.forEach((card) => {
                 const row = document.createElement('tr');
                 let statusText = '';
                 let statusClass = '';
-
                 switch (card.status) {
-                    case 'learned':
-                        statusText = 'Aprendido';
-                        statusClass = 'text-green-600 font-semibold';
-                        break;
-                    case 'almost':
-                        statusText = 'Casi Aprendido';
-                        statusClass = 'text-yellow-600 font-semibold';
-                        break;
-                    case 'to_learn':
-                    default:
-                        statusText = 'Por Aprender';
-                        statusClass = 'text-red-600 font-semibold';
-                        break;
+                    case 'learned': statusText = 'Aprendido'; statusClass = 'status-learned font-semibold'; break;
+                    case 'almost': statusText = 'Repasando'; statusClass = 'status-almost font-semibold'; break;
+                    default: statusText = 'Por Aprender'; statusClass = 'status-to_learn font-semibold'; break;
                 }
-
                 row.innerHTML = `
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${card.unidad}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">${card.pregunta}</td>
-                    <td class="px-4 py-2 text-sm text-gray-500">${card.respuesta}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-300">${card.id + 1}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-400">${card.unidad}</td>
+                    <td class="px-4 py-2 text-sm text-gray-300">${card.pregunta}</td>
+                    <td class="px-4 py-2 text-sm text-gray-400">${card.respuesta}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm ${statusClass}">${statusText}</td>
                 `;
                 allCardsTableBody.appendChild(row);
             });
         }
-
-        // Cambia la vista visible
-        function switchView(viewToShow) {
+        function switchView(viewToShow) { /* ... (sin cambios) ... */
             viewStudy.classList.add('view-hidden');
             viewPiles.classList.add('view-hidden');
             viewAll.classList.add('view-hidden');
 
-            document.getElementById(`view-${viewToShow}`).classList.remove('view-hidden');
+            const targetView = document.getElementById(`view-${viewToShow}`);
+            if (targetView) {
+                targetView.classList.remove('view-hidden');
+            } else {
+                console.error(`View with ID 'view-${viewToShow}' not found.`);
+                viewStudy.classList.remove('view-hidden');
+                viewToShow = 'study';
+            }
             currentView = viewToShow;
 
-            // Resaltar botón de navegación activo
-             btnViewStudy.classList.toggle('bg-blue-700', viewToShow === 'study');
-             btnViewPiles.classList.toggle('bg-blue-700', viewToShow === 'piles');
-             btnViewAll.classList.toggle('bg-blue-700', viewToShow === 'all');
+            document.querySelectorAll('#sidebar nav button').forEach(btn => {
+                btn.classList.remove('bg-gray-700', 'text-white');
+                btn.classList.add('text-gray-200', 'hover:bg-gray-700');
+            });
+            const activeButton = document.getElementById(`btn-view-${viewToShow}`);
+            if (activeButton) {
+                activeButton.classList.add('bg-gray-700', 'text-white');
+                activeButton.classList.remove('text-gray-200');
+            }
 
-            // Actualizar contenido de la vista si es necesario
             if (viewToShow === 'piles') {
                 updatePilesView();
             } else if (viewToShow === 'all') {
                 updateAllCardsView();
             } else if (viewToShow === 'study') {
-                 // Si volvemos a estudiar y la pila estaba vacía, re-construir
-                 if (currentCardIndex === -1 && cards.some(c => c.status === 'to_learn' || c.status === 'almost')) {
-                     buildStudyPile();
-                 }
-                 displayCurrentCard(); // Asegurarse de mostrar la tarjeta correcta
+                if (currentCardIndex === -1 && cards.some(c => c.status === 'to_learn' || c.status === 'almost')) {
+                    console.log("Rebuilding study pile on switching back to study view as it was empty.");
+                    buildStudyPile();
+                }
+                displayCurrentCard(); // Asegura mostrar tarjeta/mensaje correcto
+            }
+
+            if (window.innerWidth < 768) {
+                closeSidebar();
             }
         }
-
-        // Actualiza todas las vistas (contadores y tarjeta actual)
-         function updateAllViews() {
-             updatePilesView(); // Siempre actualiza contadores
+        function updateAllViews() { /* ... (sin cambios) ... */
+              updatePilesView();
              if (currentView === 'study') {
-                 displayCurrentCard(); // Actualiza la tarjeta si estamos en la vista de estudio
-             } else if (currentView === 'all') {
-                 updateAllCardsView(); // Actualiza la tabla si estamos en esa vista
-             }
-         }
-
-        // Reinicia el progreso de todas las tarjetas
-        function resetProgress() {
-            if (confirm("¿Estás seguro de que quieres reiniciar todo tu progreso? Todas las tarjetas volverán a 'Por Aprender'.")) {
-                initializeCards(); // Reinicializa los estados
+                displayCurrentCard();
+            } else if (currentView === 'all') {
+                updateAllCardsView();
+            }
+        }
+        function resetProgress() { /* ... (sin cambios) ... */
+             if (confirm("¿Estás seguro de que quieres reiniciar todo tu progreso? Todas las tarjetas volverán al estado 'Por Aprender'.")) {
+                initializeCards();
                 buildStudyPile();
                 updateAllViews();
-                 switchView('study'); // Cambiar a la vista de estudio
+                switchView('study');
+                console.log("Progress reset.");
             }
+        }
+        function openSidebar() { /* ... (sin cambios) ... */
+             sidebar.style.transform = 'translateX(0)';
+            sidebarOverlay.classList.add('visible');
+        }
+        function closeSidebar() { /* ... (sin cambios) ... */
+            sidebar.style.transform = 'translateX(-100%)';
+            sidebarOverlay.classList.remove('visible');
         }
 
         // --- Event Listeners ---
-        cardContainer.addEventListener('click', flipCard);
-
+        cardContainer.addEventListener('click', flipCard); // <--- Listener para voltear
         btnNotLearned.addEventListener('click', () => updateCardStatus('to_learn'));
         btnAlmost.addEventListener('click', () => updateCardStatus('almost'));
         btnLearned.addEventListener('click', () => updateCardStatus('learned'));
         btnResetProgress.addEventListener('click', resetProgress);
-
         btnViewStudy.addEventListener('click', () => switchView('study'));
         btnViewPiles.addEventListener('click', () => switchView('piles'));
         btnViewAll.addEventListener('click', () => switchView('all'));
+        openSidebarBtn.addEventListener('click', openSidebar);
+        closeSidebarBtn.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
 
         // --- Inicialización ---
-        document.addEventListener('DOMContentLoaded', () => {
-            loadState(); // Cargar estado al iniciar (ahora combina datos embebidos y estados de LS)
-            switchView('study'); // Mostrar vista de estudio por defecto
+        document.addEventListener('DOMContentLoaded', () => { /* ... (sin cambios) ... */
+              console.log("DOM loaded. Initializing application...");
+            loadState();
+            switchView('study');
+            console.log("Application initialized successfully.");
         });
 
     </script>
