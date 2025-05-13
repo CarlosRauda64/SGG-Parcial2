@@ -40,7 +40,7 @@
          <nav class="flex flex-col space-y-3">
              <button id="btn-view-study" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Estudiar</button>
              <button id="btn-view-piles" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Pilas</button>
-             <button id="btn-view-all" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Todas</button>
+             <button id="btn-view-all" class="text-left w-full hover:bg-gray-700 px-3 py-2 rounded transition duration-200">Cards</button>
          </nav>
     </aside>
 
@@ -98,25 +98,34 @@
             </section>
 
             <section id="view-all" class="view-hidden">
-                 <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg max-w-4xl mx-auto border border-gray-700">
-                     <h2 class="text-xl font-semibold mb-4 text-center text-white">Todas las Tarjetas</h2>
-                     <div class="overflow-x-auto">
-                         <table class="min-w-full divide-y divide-gray-700">
-                             <thead class="bg-gray-700">
-                                 <tr>
-                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
-                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Unidad</th>
-                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Pregunta</th>
-                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Respuesta</th>
-                                     <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Estado</th>
-                                 </tr>
-                             </thead>
-                             <tbody id="all-cards-table-body" class="bg-gray-800 divide-y divide-gray-700">
-                                 <tr><td colspan="5" class="text-center p-4 text-gray-400">Cargando tarjetas...</td></tr>
-                             </tbody>
-                         </table>
-                     </div>
-                 </div>
+                <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg max-w-4xl mx-auto border border-gray-700">
+                    <h2 class="text-xl font-semibold mb-4 text-center text-white">Cards</h2>
+                    
+                    <!-- Filtro por unidad -->
+                    <div class="mb-4">
+                        <label for="unit-filter-all" class="block text-sm font-medium text-gray-300 mb-1">Filtrar por Unidad:</label>
+                        <select id="unit-filter-all" name="unit-filter-all" class="block w-full pl-3 pr-10 py-2 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-700 text-gray-200">
+                            <!-- Opciones se llenarán dinámicamente -->
+                        </select>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-700">
+                            <thead class="bg-gray-700">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Unidad</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Pregunta</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Respuesta</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-cards-table-body" class="bg-gray-800 divide-y divide-gray-700">
+                                <tr><td colspan="5" class="text-center p-4 text-gray-400">Cargando tarjetas...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
         </main>
@@ -339,7 +348,7 @@
          const pileAlmostCount = document.getElementById('pile-almost-count');
          const pileLearnedCount = document.getElementById('pile-learned-count');
          const allCardsTableBody = document.getElementById('all-cards-table-body');
-
+         const unitFilterAll = document.getElementById('unit-filter-all');
 
         // --- Funciones Principales ---
         // ... (Todas las funciones JS son idénticas a la versión anterior) ...
@@ -393,6 +402,7 @@
 
              // Poblar el selector de unidades AHORA que 'cards' está cargado
               populateUnitFilter();
+              populateUnitFilterAll(); // Llenar filtro de la sección "Cards"
               // Asegurarse que el valor del select coincida con el filtro cargado/por defecto
               unitFilterSelect.value = selectedUnitFilter;
 
@@ -567,32 +577,35 @@
          }
 
          function updateAllCardsView() {
-              allCardsTableBody.innerHTML = '';
-             if (cards.length === 0) {
-                 allCardsTableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-400">No hay tarjetas cargadas.</td></tr>';
+             const selectedUnit = unitFilterAll.value; // Obtener la unidad seleccionada
+             allCardsTableBody.innerHTML = '';
+             const filteredCards = (selectedUnit === 'all')
+                 ? cards
+                 : cards.filter(card => card.unidad === selectedUnit);
+
+             if (filteredCards.length === 0) {
+                 allCardsTableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-400">No hay tarjetas para esta unidad.</td></tr>';
                  return;
              }
-             // Ordenar por índice original para consistencia
-             const sortedCards = [...cards].sort((a, b) => a.originalIndex - b.originalIndex);
 
-             sortedCards.forEach((card) => {
-                  const row = document.createElement('tr');
-                  let statusText = '';
-                  let statusClass = '';
-                  switch (card.status) {
-                      case 'learned': statusText = 'Aprendido'; statusClass = 'status-learned font-semibold'; break;
-                      case 'almost': statusText = 'Repasando'; statusClass = 'status-almost font-semibold'; break;
-                      default: statusText = 'Por Aprender'; statusClass = 'status-to_learn font-semibold'; break;
-                  }
-                  row.innerHTML = `
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-300">${card.originalIndex + 1}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-400">${card.unidad}</td>
-                      <td class="px-4 py-2 text-sm text-gray-300">${card.pregunta}</td>
-                      <td class="px-4 py-2 text-sm text-gray-400">${card.respuesta}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm ${statusClass}">${statusText}</td>
-                  `;
-                  allCardsTableBody.appendChild(row);
-              });
+             filteredCards.forEach((card, index) => {
+                 const row = document.createElement('tr');
+                 let statusText = '';
+                 let statusClass = '';
+                 switch (card.status) {
+                     case 'learned': statusText = 'Aprendido'; statusClass = 'status-learned font-semibold'; break;
+                     case 'almost': statusText = 'Repasando'; statusClass = 'status-almost font-semibold'; break;
+                     default: statusText = 'Por Aprender'; statusClass = 'status-to_learn font-semibold'; break;
+                 }
+                 row.innerHTML = `
+                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-300">${index + 1}</td>
+                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-400">${card.unidad}</td>
+                     <td class="px-4 py-2 text-sm text-gray-300">${card.pregunta}</td>
+                     <td class="px-4 py-2 text-sm text-gray-400">${card.respuesta}</td>
+                     <td class="px-4 py-2 whitespace-nowrap text-sm ${statusClass}">${statusText}</td>
+                 `;
+                 allCardsTableBody.appendChild(row);
+             });
          }
 
          function switchView(viewToShow) {
@@ -661,6 +674,17 @@
               });
           }
 
+          function populateUnitFilterAll() {
+              unitFilterAll.innerHTML = '';
+              const units = getUniqueUnits();
+              units.forEach(unit => {
+                  const option = document.createElement('option');
+                  option.value = unit;
+                  option.textContent = (unit === 'all') ? 'Todas las Unidades' : unit;
+                  unitFilterAll.appendChild(option);
+              });
+          }
+
           function applyUnitFilter(unit) {
               console.log("Applying filter:", unit);
               selectedUnitFilter = unit;
@@ -693,6 +717,7 @@
         unitFilterSelect.addEventListener('change', (event) => {
             applyUnitFilter(event.target.value);
         });
+        unitFilterAll.addEventListener('change', updateAllCardsView);
 
         // --- Inicialización ---
         document.addEventListener('DOMContentLoaded', () => {
